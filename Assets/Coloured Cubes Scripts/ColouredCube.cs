@@ -1,9 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
-
-public class ColouredCube : MonoBehaviour {
-
+using KModkit;
+using Rnd = UnityEngine.Random;
+public class ColouredCube : MonoBehaviour
+{
 	// Use this for initialization
 	void Start () {
 		

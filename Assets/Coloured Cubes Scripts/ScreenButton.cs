@@ -7,7 +7,7 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class StageLight : MonoBehaviour
+public class ScreenButton : MonoBehaviour
 {
 	// Use this for initialization
 	void Start () {
