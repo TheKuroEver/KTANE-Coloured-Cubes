@@ -11,10 +11,9 @@ public class Set : MonoBehaviour
 {
     private List<SetValue> _mostRecentCorrectValues;
     private List<SetValue> _allowedValues;
+    private int[] _mostRecentCorrectPositions;
 
-    private int[] _correctValuePositions;
-
-    public List<SetValue> MostRecentCorrectValues { get { return _mostRecentCorrectValues; } }
+    public int[] MostRecentCorrectPositions { get { return _mostRecentCorrectPositions; } }
 
     public SetValue[] GenerateSETValuesWithOneSet(int parameterCount, int setValueCount, SetValue hiddenValue = null)
     {
@@ -34,7 +33,7 @@ public class Set : MonoBehaviour
 
         for (int i = 0; i < 9; i++)
         {
-            if (_correctValuePositions.Contains(i))
+            if (_mostRecentCorrectPositions.Contains(i))
             {
                 valueToAdd = _mostRecentCorrectValues[correctValueCount];
                 correctValueCount++;
@@ -85,12 +84,14 @@ public class Set : MonoBehaviour
         {
             _mostRecentCorrectValues.Add(hiddenValue);
             _allowedValues.Remove(hiddenValue);
-            _correctValuePositions = new int[] { Rnd.Range(0, setValueCount), Rnd.Range(0, setValueCount) };
+            _mostRecentCorrectPositions = new int[] { Rnd.Range(0, setValueCount), Rnd.Range(0, setValueCount) };
         }
         else
         {
-            _correctValuePositions = new int[] { Rnd.Range(0, setValueCount), Rnd.Range(0, setValueCount), Rnd.Range(0, setValueCount) };
+            _mostRecentCorrectPositions = new int[] { Rnd.Range(0, setValueCount), Rnd.Range(0, setValueCount), Rnd.Range(0, setValueCount) };
         }
+
+        RemoveDuplicatePositions(setValueCount);
 
         while (_mostRecentCorrectValues.Count() < 2)
         {
@@ -103,6 +104,18 @@ public class Set : MonoBehaviour
         _allowedValues.Remove(_mostRecentCorrectValues[2]);
 
         if (hiddenValue != null) { _mostRecentCorrectValues.RemoveAt(0); }
+    }
+
+    void RemoveDuplicatePositions(int setValueCount)
+    {
+        for (int i = 1; i < _mostRecentCorrectPositions.Length; i++)
+        {
+            while (_mostRecentCorrectPositions.ToList().GetRange(0, i).Contains(_mostRecentCorrectPositions[i]))
+            {
+                _mostRecentCorrectPositions[i]++;
+                _mostRecentCorrectPositions[i] %= setValueCount;
+            }
+        }
     }
 
     public SetValue FindSetWith(SetValue valueOne, SetValue valueTwo)
