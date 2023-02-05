@@ -12,8 +12,6 @@ public class ColouredCube : MonoBehaviour
     [SerializeField] private Transform _cubeTransform;
     [SerializeField] private MeshRenderer _cubeRenderer;
 
-    private static List<ColouredCube> _instances = new List<ColouredCube>();
-
     private const float _biggestCubeSize = 0.028f;
     private const float _topLeftCubeXValue = -0.056f;
     private const float _topLeftCubeZValue = 0.014f;
@@ -64,10 +62,9 @@ public class ColouredCube : MonoBehaviour
 
     void Start()
     {
-        _instances.Add(this);
         GetPositionFromName();
-        // _cubeTransform.localPosition = new Vector3(_topLeftCubeXValue + _position[1] * _distanceBetweenCubes, _revealedYValue - 0.05f, _topLeftCubeZValue - _position[0] * _distanceBetweenCubes);
-
+        _cubeTransform.localPosition = new Vector3(_topLeftCubeXValue + _position[1] * _distanceBetweenCubes, _revealedYValue - 0.05f, _topLeftCubeZValue - _position[0] * _distanceBetweenCubes);
+        _cube.SetActive(false);
     }
 
     private void GetPositionFromName()
@@ -76,23 +73,64 @@ public class ColouredCube : MonoBehaviour
         _position[1] = "ABC".IndexOf(_cubeTransform.name[0]);
     }
 
-    public static bool AreBusy()
+    public static bool AreBusy(ColouredCube[] cubes)
     {
-        return _instances.Any(cube => cube.IsBusy);
+        return cubes.Any(cube => cube.IsBusy);
     }
 
-    public static void SetHiddenStates(ColouredCube[] cubes, bool[] newStates)
+    public static void SetHiddenStates(ColouredCube[] cubes, bool newState, float transitionTime = 1)
+    {
+        foreach (ColouredCube cube in cubes)
+        {
+            cube.SetHiddenState(newState, transitionTime);
+        }
+    }
+
+    public static void SetHiddenStates(ColouredCube[] cubes, bool[] newStates, float transitionTime = 1)
     {
         if (cubes.Length != newStates.Length) { throw new RankException("Number of cubes and number of states to set do not match."); }
 
         for (int i = 0; i < cubes.Length; i++)
         {
-            cubes[i].SetHiddenState(newStates[i]);
+            cubes[i].SetHiddenState(newStates[i], transitionTime);
         }
     }
 
-    private void SetHiddenState(bool newState)
+    private void SetActive(bool state = true)
+    {
+        _cube.SetActive(state);
+    }
+
+    private void SetHiddenState(bool newState, float transitionTime)
     {
         if (newState == _isHidden) { return; }
+        if (_isHiding) { return; }
+
+        _isHiding = true;
+        _isHidden = newState;
+        SetActive();
+        StartCoroutine(HidingAnimation(newState, transitionTime));
+    }
+
+    private IEnumerator HidingAnimation(bool makeHidden, float transitionTime)
+    {
+        float elapsedTime = 0;
+        float transitionProgress;
+        float newYValue = makeHidden ? _revealedYValue - 0.05f : _revealedYValue;
+        float oldYValue = _cubeTransform.localPosition.y;
+        float yValueDifference = newYValue - oldYValue;
+
+        yield return null;
+
+        while (elapsedTime <= transitionTime)
+        {
+            elapsedTime += Time.deltaTime;
+            transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
+            _cubeTransform.localPosition = new Vector3(_cubeTransform.localPosition.x, oldYValue + transitionProgress * yValueDifference, _cubeTransform.localPosition.z);
+            yield return null;
+        }
+
+        _isHiding = false;
+        SetActive(!makeHidden);
     }
 }

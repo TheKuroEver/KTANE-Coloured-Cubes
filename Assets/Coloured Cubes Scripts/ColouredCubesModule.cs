@@ -29,6 +29,8 @@ public class ColouredCubesModule : MonoBehaviour
 	// private Cycle[] _stageTwoCycles;
 	private SetValue _stageThreeHiddenValue;
 
+	private int _counter = 0;
+
 	void Awake()
     {
 		ModuleId = ModuleIdCounter++;

@@ -2910,7 +2910,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb011c5af29e8847b199448b6ac0ce0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cube: {fileID: 0}
+  _cube: {fileID: 1573499072024904}
   _cubeTransform: {fileID: 4638225837127716}
   _cubeRenderer: {fileID: 23646328601202040}
 --- !u!114 &114112234334471292
@@ -3023,7 +3023,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb011c5af29e8847b199448b6ac0ce0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cube: {fileID: 0}
+  _cube: {fileID: 1444823834774084}
   _cubeTransform: {fileID: 4284165188623126}
   _cubeRenderer: {fileID: 23665026037469928}
 --- !u!114 &114215668508833490
@@ -3120,7 +3120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb011c5af29e8847b199448b6ac0ce0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cube: {fileID: 0}
+  _cube: {fileID: 1867880811714866}
   _cubeTransform: {fileID: 4889882846451258}
   _cubeRenderer: {fileID: 23997315304459664}
 --- !u!114 &114354694745270128
@@ -3134,7 +3134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb011c5af29e8847b199448b6ac0ce0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cube: {fileID: 0}
+  _cube: {fileID: 1214120143083130}
   _cubeTransform: {fileID: 4116924489976650}
   _cubeRenderer: {fileID: 23209636259470342}
 --- !u!114 &114379131249926726
@@ -3330,7 +3330,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb011c5af29e8847b199448b6ac0ce0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cube: {fileID: 0}
+  _cube: {fileID: 1715463490271466}
   _cubeTransform: {fileID: 4217512660651016}
   _cubeRenderer: {fileID: 23733740341627714}
 --- !u!114 &114484060536834108
@@ -3502,7 +3502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb011c5af29e8847b199448b6ac0ce0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cube: {fileID: 0}
+  _cube: {fileID: 1951971540603804}
   _cubeTransform: {fileID: 4735469620248498}
   _cubeRenderer: {fileID: 23636079657964408}
 --- !u!114 &114657707975638924
@@ -3555,7 +3555,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb011c5af29e8847b199448b6ac0ce0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cube: {fileID: 0}
+  _cube: {fileID: 1560866997067542}
   _cubeTransform: {fileID: 4411065354458790}
   _cubeRenderer: {fileID: 23433473205291116}
 --- !u!114 &114734123438495946
@@ -3740,7 +3740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb011c5af29e8847b199448b6ac0ce0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cube: {fileID: 0}
+  _cube: {fileID: 1990546600461504}
   _cubeTransform: {fileID: 4879601378896682}
   _cubeRenderer: {fileID: 23254018683544132}
 --- !u!114 &114887508628453514
