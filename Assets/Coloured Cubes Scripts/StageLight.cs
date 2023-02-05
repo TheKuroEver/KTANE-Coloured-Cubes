@@ -9,7 +9,7 @@ using Rnd = UnityEngine.Random;
 
 public class StageLight : MonoBehaviour
 {
-	[SerializeField] private MeshRenderer stageLightMaterial;
+	[SerializeField] private MeshRenderer _stageLightRenderer;
 	private string _colourName = "Black";
 
 	public string ColourName { get { return _colourName; } }
@@ -28,7 +28,7 @@ public class StageLight : MonoBehaviour
 
 	public void SetColour(Color colour)
     {
-		stageLightMaterial.material.color = colour;
+		_stageLightRenderer.material.color = colour;
 		_colourName = BinaryColourValuesToName[colour.r.ToString() + colour.g.ToString() + colour.b.ToString()];
     }
 }
