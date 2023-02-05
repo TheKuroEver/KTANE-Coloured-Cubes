@@ -7,7 +7,7 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class StageLight : MonoBehaviour
+public class StageLight : MonoBehaviour, ColouredItem
 {
 	[SerializeField] private MeshRenderer _stageLightRenderer;
 	private string _colourName = "Black";

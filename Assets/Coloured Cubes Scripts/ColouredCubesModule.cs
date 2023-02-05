@@ -29,28 +29,26 @@ public class ColouredCubesModule : MonoBehaviour
 	// private Cycle[] _stageTwoCycles;
 	private SetValue _stageThreeHiddenValue;
 
-	private int _counter = 0;
-
 	void Awake()
     {
 		ModuleId = ModuleIdCounter++;
 
-		AssignInteractionMethods();
+		AssignInteractionHandlers();
 	}
 
-	void AssignInteractionMethods()
+	void AssignInteractionHandlers()
     {
 		foreach (ColouredCube cube in Cubes)
 		{
 			cube.GetComponentInParent<KMSelectable>().OnInteract += delegate () { CubePress(cube); return false; };
-			// cube.GetComponentInParent<KMSelectable>().OnHighlight += delegate () { Screen.ShowColour(cube.ColourAsName); };
-			// cube.GetComponentInParent<KMSelectable>().OnHighlightEnded += delegate () { Screen.StopShowingColour(); };
+			cube.GetComponentInParent<KMSelectable>().OnHighlight += delegate () { Screen.DisplayColourName(cube); };
+			cube.GetComponentInParent<KMSelectable>().OnHighlightEnded += delegate () { Screen.StopDisplayingColourName(); };
 		}
 
 		foreach (StageLight light in StageLights)
 		{
 			light.GetComponentInParent<KMSelectable>().OnInteract += delegate () { StageLightPress(light); return false; };
-			light.GetComponentInParent<KMSelectable>().OnHighlight += delegate () { Screen.DisplayColourName(light.ColourName); };
+			light.GetComponentInParent<KMSelectable>().OnHighlight += delegate () { Screen.DisplayColourName(light); };
 			light.GetComponentInParent<KMSelectable>().OnHighlightEnded += delegate () { Screen.StopDisplayingColourName(); };
 		}
 

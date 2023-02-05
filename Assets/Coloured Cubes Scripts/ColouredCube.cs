@@ -6,12 +6,13 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
-public class ColouredCube : MonoBehaviour
+public class ColouredCube : MonoBehaviour, ColouredItem
 {
     [SerializeField] private GameObject _cube;
     [SerializeField] private Transform _cubeTransform;
     [SerializeField] private MeshRenderer _cubeRenderer;
 
+    private const float _transitionTime = 1;
     private const float _biggestCubeSize = 0.028f;
     private const float _topLeftCubeXValue = -0.056f;
     private const float _topLeftCubeZValue = 0.014f;
@@ -78,7 +79,7 @@ public class ColouredCube : MonoBehaviour
         return cubes.Any(cube => cube.IsBusy);
     }
 
-    public static void SetHiddenStates(ColouredCube[] cubes, bool newState, float transitionTime = 1)
+    public static void SetHiddenStates(ColouredCube[] cubes, bool newState, float transitionTime = _transitionTime)
     {
         foreach (ColouredCube cube in cubes)
         {
@@ -86,7 +87,7 @@ public class ColouredCube : MonoBehaviour
         }
     }
 
-    public static void SetHiddenStates(ColouredCube[] cubes, bool[] newStates, float transitionTime = 1)
+    public static void SetHiddenStates(ColouredCube[] cubes, bool[] newStates, float transitionTime = _transitionTime)
     {
         if (cubes.Length != newStates.Length) { throw new RankException("Number of cubes and number of states to set do not match."); }
 
@@ -132,5 +133,39 @@ public class ColouredCube : MonoBehaviour
 
         _isHiding = false;
         SetActive(!makeHidden);
+    }
+
+    public void SetColour(string newColour)
+    {
+        if (TernaryColourValuesToName[newColour] == _colourName) { return; }
+        if (_isChangingColour) { return; }
+
+        _isChangingColour = true;
+        _colourName = TernaryColourValuesToName[newColour];
+        StartCoroutine(ColourAnimation(newColour));
+    }
+
+    private IEnumerator ColourAnimation(string newColour)
+    {
+        float elapsedTime = 0;
+        float transitionProgress;
+        float oldRed = _cubeRenderer.material.color.r;
+        float oldGreen = _cubeRenderer.material.color.g;
+        float oldBlue = _cubeRenderer.material.color.b;
+        float redDifference = 0.5f * (newColour[0] - '0') - oldRed;
+        float greenDifference = 0.5f * (newColour[1] - '0') - oldGreen;
+        float blueDifference = 0.5f * (newColour[2] - '0') - oldBlue;
+
+        yield return null;
+
+        while (elapsedTime / _transitionTime <= 1)
+        {
+            elapsedTime += Time.deltaTime;
+            transitionProgress = Mathf.Min(elapsedTime / _transitionTime, 1);
+            _cubeRenderer.material.color = new Color(oldRed + transitionProgress * redDifference, oldGreen + transitionProgress * greenDifference, oldBlue + transitionProgress * blueDifference);
+            yield return null;
+        }
+
+        _isChangingColour = false;
     }
 }
