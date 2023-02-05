@@ -9,7 +9,8 @@ using Rnd = UnityEngine.Random;
 
 public class ScreenButton : MonoBehaviour
 {
-	// Use this for initialization
+	[SerializeField] private TextMesh _screenText;
+
 	void Start () {
 		
 	}
