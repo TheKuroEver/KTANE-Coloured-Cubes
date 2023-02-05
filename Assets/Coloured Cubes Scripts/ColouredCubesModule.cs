@@ -8,7 +8,7 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class ColouredCubeModule : MonoBehaviour
+public class ColouredCubesModule : MonoBehaviour
 {
 	public KMBombInfo Bomb;
 	public KMAudio Audio;
@@ -17,6 +17,7 @@ public class ColouredCubeModule : MonoBehaviour
 	public ColouredCube[] Cubes;
 	public StageLight[] StageLights;
 	public ScreenButton Screen;
+
 	public Set SET;
 	public PermsManager PermsGenerator;
 
@@ -33,8 +34,8 @@ public class ColouredCubeModule : MonoBehaviour
 
 	void Start()
     {
-		SET.GenerateSETValuesWithOneSet(4, 9);
-    }
+
+	}
 
 	void AssignInteractionMethods()
     {
@@ -69,4 +70,19 @@ public class ColouredCubeModule : MonoBehaviour
     {
 
     }
+
+	private class StageInfo
+	{ 
+		private readonly SetValue[] _allValues;
+		private readonly SetValue[] _correctValues;
+
+		public SetValue[] AllValues { get { return _allValues; } }
+		public SetValue[] CorrectValues { get { return _correctValues; } }
+
+		public StageInfo(SetValue[] allValues, SetValue[] correctValues)
+        {
+			_allValues = allValues;
+			_correctValues = correctValues;
+        }
+	}
 }
