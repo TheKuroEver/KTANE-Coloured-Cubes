@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 23592450644315710}
   - component: {fileID: 114765783806210424}
   - component: {fileID: 114524608154352466}
+  - component: {fileID: 114262599682353706}
   m_Layer: 0
   m_Name: Stage Light Button
   m_TagString: Untagged
@@ -43,6 +44,7 @@ GameObject:
   - component: {fileID: 65727365462393786}
   - component: {fileID: 23384218365523796}
   - component: {fileID: 114310647301326152}
+  - component: {fileID: 114520486401179538}
   m_Layer: 0
   m_Name: Highlight
   m_TagString: Untagged
@@ -183,6 +185,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114262599682353706
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1048254578233990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - KT/Mobile/DiffuseTint
 --- !u!114 &114310647301326152
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -196,6 +211,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HighlightScale: {x: 1, y: 1, z: 1}
   OutlineAmount: 0
+--- !u!114 &114520486401179538
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1670529633511404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - KT/Outline
 --- !u!114 &114524608154352466
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -229,4 +257,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81724d49c30dd944cb8b467f68d2456a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageLightMaterial: {fileID: 23592450644315710}
+  _stageLightRenderer: {fileID: 0}
