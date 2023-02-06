@@ -141,7 +141,6 @@ public class Set : MonoBehaviour
             _allowedValues.Remove(FindSetWith(lastAddedValue, value));
         }
     }
-
 }
 
 public class SetValue: IEquatable<SetValue>
