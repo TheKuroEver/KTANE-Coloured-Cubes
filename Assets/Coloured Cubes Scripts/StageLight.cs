@@ -7,12 +7,10 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class StageLight : MonoBehaviour, ColouredItem
+public class StageLight : MonoBehaviour, IColouredItem
 {
 	[SerializeField] private MeshRenderer _stageLightRenderer;
 	private string _colourName = "Black";
-
-	public string ColourName { get { return _colourName; } }
 
 	private readonly Dictionary<string, string> BinaryColourValuesToName = new Dictionary<string, string>()
 	{
@@ -25,6 +23,8 @@ public class StageLight : MonoBehaviour, ColouredItem
 		{ "110", "Green" },
 		{ "111", "White" }
 	};
+
+	public string ColourName { get { return _colourName; } }
 
 	public void SetColour(Color colour)
     {

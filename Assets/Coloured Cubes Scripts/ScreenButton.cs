@@ -11,7 +11,7 @@ public class ScreenButton : MonoBehaviour
 {
 	[SerializeField] private TextMesh _screenText;
 
-	private ColouredItem _buttonToWatch;
+	private IColouredItem _buttonToWatch;
 
 	private string _defaultText;
 	private string _overrideText;
@@ -28,7 +28,7 @@ public class ScreenButton : MonoBehaviour
 		else { _screenText.text = _defaultText; }
     }
 
-	public void DisplayColourName(ColouredItem buttonToWatch)
+	public void DisplayColourName(IColouredItem buttonToWatch)
     {
 		_showColour = true;
 		_buttonToWatch = buttonToWatch;
@@ -55,7 +55,7 @@ public class ScreenButton : MonoBehaviour
     }
 }
 
-public interface ColouredItem
+public interface IColouredItem
 {
 	string ColourName { get; }
 }

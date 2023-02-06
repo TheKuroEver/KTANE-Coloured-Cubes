@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
-public class ColouredCube : MonoBehaviour, ColouredItem
+public class ColouredCube : MonoBehaviour, IColouredItem
 {
     [SerializeField] private GameObject _cube;
     [SerializeField] private Transform _cubeTransform;
@@ -19,16 +19,15 @@ public class ColouredCube : MonoBehaviour, ColouredItem
     private const float _revealedYValue = 0.013f;
     private const float _distanceBetweenCubes = 0.035f;
 
-    private int[] _position = new int[2]; // (row, column), with top left being (0, 0);
+    private int _position; // Position in reading order, starting from 0.
+    private int _size = 2;
     private string _colourName = "Gray";
 
     private bool _isHidden = true;
     private bool _isMoving = false;
     private bool _isHiding = false;
     private bool _isChangingColour = false;
-
-    public string ColourName { get { return _colourName; } }
-    public bool IsBusy { get { return _isMoving || _isChangingColour || _isHiding; } }
+    private bool _isChangingSize = false;
 
     private readonly Dictionary<string, string> TernaryColourValuesToName = new Dictionary<string, string>()
     {
@@ -61,17 +60,25 @@ public class ColouredCube : MonoBehaviour, ColouredItem
         { "222", "White" }
     };
 
+    public string ColourName { get { return _colourName; } }
+    public bool IsBusy { get { return _isMoving || _isChangingColour || _isHiding || _isChangingSize; } }
+
     void Start()
     {
         GetPositionFromName();
-        _cubeTransform.localPosition = new Vector3(_topLeftCubeXValue + _position[1] * _distanceBetweenCubes, _revealedYValue - 0.05f, _topLeftCubeZValue - _position[0] * _distanceBetweenCubes);
-        _cube.SetActive(false);
+        // _cubeTransform.localPosition = new Vector3(_topLeftCubeXValue + _position[1] * _distanceBetweenCubes, _revealedYValue - 0.05f, _topLeftCubeZValue - _position[0] * _distanceBetweenCubes);
+        // _cube.SetActive(false);
+        Debug.Log(_cubeTransform.name + ":" + (Position)_position);
+    }
+
+    private void SetActive(bool state = true)
+    {
+        _cube.SetActive(state);
     }
 
     private void GetPositionFromName()
     {
-        _position[0] = "123".IndexOf(_cubeTransform.name[1]);
-        _position[1] = "ABC".IndexOf(_cubeTransform.name[0]);
+        _position = 3 * "123".IndexOf(_cubeTransform.name[1]) + "ABC".IndexOf(_cubeTransform.name[0]);
     }
 
     public static bool AreBusy(ColouredCube[] cubes)
@@ -79,6 +86,7 @@ public class ColouredCube : MonoBehaviour, ColouredItem
         return cubes.Any(cube => cube.IsBusy);
     }
 
+    // Hiding code.
     public static void SetHiddenStates(ColouredCube[] cubes, bool newState, float transitionTime = _transitionTime)
     {
         foreach (ColouredCube cube in cubes)
@@ -95,11 +103,6 @@ public class ColouredCube : MonoBehaviour, ColouredItem
         {
             cubes[i].SetHiddenState(newStates[i], transitionTime);
         }
-    }
-
-    private void SetActive(bool state = true)
-    {
-        _cube.SetActive(state);
     }
 
     private void SetHiddenState(bool newState, float transitionTime)
@@ -135,17 +138,18 @@ public class ColouredCube : MonoBehaviour, ColouredItem
         SetActive(!makeHidden);
     }
 
-    public void SetColour(string newColour)
+    // Colour code.
+    private void SetColour(string newColour)
     {
         if (TernaryColourValuesToName[newColour] == _colourName) { return; }
         if (_isChangingColour) { return; }
 
         _isChangingColour = true;
         _colourName = TernaryColourValuesToName[newColour];
-        StartCoroutine(ColourAnimation(newColour));
+        StartCoroutine(ColourChangeAnimation(newColour));
     }
 
-    private IEnumerator ColourAnimation(string newColour)
+    private IEnumerator ColourChangeAnimation(string newColour)
     {
         float elapsedTime = 0;
         float transitionProgress;
@@ -168,4 +172,91 @@ public class ColouredCube : MonoBehaviour, ColouredItem
 
         _isChangingColour = false;
     }
+
+    // Size code.
+    private void SetSize(int newSize)
+    {
+        if (_size == newSize) { return; }
+        if (_isChangingSize) { return; }
+
+        _isChangingSize = true;
+        _size = newSize;
+        StartCoroutine(SizeChangeAnimation(newSize));
+    }
+
+    private IEnumerator SizeChangeAnimation(int newSize)
+    {
+        float elapsedTime = 0;
+        float transitionProgress;
+        float oldSize = _cubeTransform.localScale.x;
+        float sizeDifference = (2 + newSize) / 4f * _biggestCubeSize - oldSize;
+        float currentSize;
+
+        yield return null;
+
+        while (elapsedTime / _transitionTime <= 1)
+        {
+            elapsedTime += Time.deltaTime;
+            transitionProgress = Mathf.Min(elapsedTime / _transitionTime, 1);
+            currentSize = oldSize + transitionProgress * sizeDifference;
+            _cubeTransform.localScale = new Vector3(currentSize, currentSize, currentSize);
+            yield return null;
+        }
+
+        _isChangingSize = false;
+    }
+
+    // Position code.
+    private void SetPosition(int newPosition)
+    {
+        if (_position == newPosition) { return; }
+        if (_isMoving) { return; }
+
+        _isMoving = true;
+        _position = newPosition;
+        StartCoroutine(MoveAnimation(GetRowColumn(newPosition)));
+    }
+
+    private int[] GetRowColumn(int positionNumber)
+    {
+        int row = positionNumber / 3;
+        int column = positionNumber % 3;
+
+        return new int[] { row, column };
+    }
+
+    private IEnumerator MoveAnimation(int[] newPosition)
+    {
+        float elapsedTime = 0;
+        float transitionProgress;
+        float oldX = _cubeTransform.localPosition.x;
+        float oldZ = _cubeTransform.localPosition.z;
+        float xDifference = _topLeftCubeXValue + newPosition[1] * _distanceBetweenCubes - oldX;
+        float zDifference = _topLeftCubeZValue - newPosition[0] * _distanceBetweenCubes - oldZ; // Minus since positive Z is up, not down.
+
+        yield return null;
+
+        while (elapsedTime / _transitionTime <= 1)
+        {
+            elapsedTime += Time.deltaTime;
+            transitionProgress = Mathf.Min(elapsedTime / _transitionTime, 1);
+            _cubeTransform.localPosition = new Vector3(oldX + transitionProgress * xDifference, _cubeTransform.localPosition.y, oldZ + transitionProgress * zDifference);
+            yield return null;
+        }
+
+        _isMoving = false;
+    }
+}
+
+public enum Position
+{ 
+    A1,
+    B1,
+    C1,
+    A2,
+    B2,
+    C2,
+    A3,
+    B3,
+    C3
 }
