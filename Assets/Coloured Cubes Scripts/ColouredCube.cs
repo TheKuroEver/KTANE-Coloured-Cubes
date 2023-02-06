@@ -21,7 +21,9 @@ public class ColouredCube : MonoBehaviour, IColouredItem
 
     private int _position; // Position in reading order, starting from 0.
     private int _size = 2;
+
     private string _colourName = "Gray";
+    private string _colourValues = "111";
 
     private bool _isHidden = true;
     private bool _isMoving = false;
@@ -155,13 +157,31 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         }
     }
 
-
-    private void SetColour(string newColour)
+    public static void ShrinkAndMakeWhite(ColouredCube[] cubes)
     {
-        if (TernaryColourValuesToName[newColour] == _colourName) { return; }
+        foreach (ColouredCube cube in cubes)
+        {
+            cube.SetColour("222");
+            cube.SetSize(0);
+        }
+    }
+
+    public static void StrikeFlash(ColouredCube[] cubes)
+    {
+        foreach (ColouredCube cube in cubes)
+        {
+            cube._cubeRenderer.material.color = Color.red;
+            cube.SetColour(cube._colourValues, true);
+        }
+    }
+
+    private void SetColour(string newColour, bool striking = false)
+    {
+        if (newColour == _colourValues && !striking) { return; }
         if (_isChangingColour) { return; }
 
         _isChangingColour = true;
+        _colourValues = newColour;
         _colourName = TernaryColourValuesToName[newColour];
         StartCoroutine(ColourChangeAnimation(newColour));
     }

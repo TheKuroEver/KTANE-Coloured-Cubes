@@ -103,7 +103,7 @@ public class ColouredCubesModule : MonoBehaviour
 
 	void ScreenPress()
     {
-
+		ColouredCube.ShrinkAndMakeWhite(Cubes);
     }
 
 	private class StageInfo
