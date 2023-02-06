@@ -86,7 +86,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         return cubes.Any(cube => cube.IsBusy);
     }
 
-    // Hiding code.
+
     public static void SetHiddenStates(ColouredCube[] cubes, bool newState, float transitionTime = _transitionTime)
     {
         foreach (ColouredCube cube in cubes)
@@ -138,7 +138,24 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         SetActive(!makeHidden);
     }
 
-    // Colour code.
+
+    public static void AssignSetValues(ColouredCube[] cubes, SetValue[] setValues) // Need to add modifierPosition argument.
+    {
+        string value;
+
+        if (cubes.Length != setValues.Length) { throw new RankException("Number of cubes and number of set values to set do not match."); }
+        
+        for (int i = 0; i < cubes.Length; i++)
+        {
+            if (setValues[i].Values.Length != 4) { throw new ArgumentException("Cubes need set values with exactly four parameters."); }
+
+            value = setValues[i].ToString();
+            cubes[i].SetColour(value.Substring(0, 3));
+            cubes[i].SetSize(value[3] - '0');
+        }
+    }
+
+
     private void SetColour(string newColour)
     {
         if (TernaryColourValuesToName[newColour] == _colourName) { return; }
@@ -173,7 +190,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         _isChangingColour = false;
     }
 
-    // Size code.
+
     private void SetSize(int newSize)
     {
         if (_size == newSize) { return; }
@@ -206,7 +223,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         _isChangingSize = false;
     }
 
-    // Position code.
+
     private void SetPosition(int newPosition)
     {
         if (_position == newPosition) { return; }
