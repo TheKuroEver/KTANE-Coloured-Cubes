@@ -62,6 +62,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         { "222", "White" }
     };
 
+    public int Size { get { return _size; } }
     public string ColourName { get { return _colourName; } }
     public bool IsBusy { get { return _isMoving || _isChangingColour || _isHiding || _isChangingSize; } }
 
@@ -141,20 +142,44 @@ public class ColouredCube : MonoBehaviour, IColouredItem
     }
 
 
-    public static void AssignSetValues(ColouredCube[] cubes, SetValue[] setValues) // Need to add modifierPosition argument.
+    public static void AssignSetValues(ColouredCube[] cubes, SetValue[] setValues, int[] positions) // Need to add modifierPosition argument.
     {
         string value;
 
-        if (cubes.Length != setValues.Length) { throw new RankException("Number of cubes and number of set values to set do not match."); }
+        if (cubes.Length != setValues.Length || cubes.Length != positions.Length) { throw new RankException("Number of cubes and number of set values to set do not match."); }
         
         for (int i = 0; i < cubes.Length; i++)
         {
             if (setValues[i].Values.Length != 4) { throw new ArgumentException("Cubes need set values with exactly four parameters."); }
 
-            value = setValues[i].ToString();
+            value = GetModifiedSetValue(setValues[i], positions[i]).ToString();
             cubes[i].SetColour(value.Substring(0, 3));
             cubes[i].SetSize(value[3] - '0');
         }
+    }
+
+    private static SetValue GetModifiedSetValue(SetValue setValue, int position)
+    {
+        var modifiedValues = new int[4];
+        int row = GetRowColumn(position)[0];
+        int column = GetRowColumn(position)[1];
+
+        for (int i = 0; i < 3; i++)
+        {
+            modifiedValues[i] = (row == i) ? (setValue.Values[i] + 1) % 3 : setValue.Values[i];
+        }
+
+        modifiedValues[3] = (setValue.Values[3] + column) % 3;
+
+        return new SetValue(modifiedValues);
+    }
+
+    private static int[] GetRowColumn(int positionNumber)
+    {
+        int row = positionNumber / 3;
+        int column = positionNumber % 3;
+
+        return new int[] { row, column };
     }
 
     public static void ShrinkAndMakeWhite(ColouredCube[] cubes)
@@ -174,6 +199,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
             cube.SetColour(cube._colourValues, true);
         }
     }
+
 
     private void SetColour(string newColour, bool striking = false)
     {
@@ -210,7 +236,6 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         _isChangingColour = false;
     }
 
-
     private void SetSize(int newSize)
     {
         if (_size == newSize) { return; }
@@ -243,7 +268,6 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         _isChangingSize = false;
     }
 
-
     private void SetPosition(int newPosition)
     {
         if (_position == newPosition) { return; }
@@ -252,14 +276,6 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         _isMoving = true;
         _position = newPosition;
         StartCoroutine(MoveAnimation(GetRowColumn(newPosition)));
-    }
-
-    private int[] GetRowColumn(int positionNumber)
-    {
-        int row = positionNumber / 3;
-        int column = positionNumber % 3;
-
-        return new int[] { row, column };
     }
 
     private IEnumerator MoveAnimation(int[] newPosition)
@@ -296,4 +312,11 @@ public enum Position
     A3,
     B3,
     C3
+}
+
+public enum Size
+{
+    small,
+    medium,
+    big
 }

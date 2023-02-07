@@ -220,13 +220,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!114 &1272255410 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114243313226458034, guid: 96808c74c137895438552fd5f969abe6,
-    type: 2}
-  m_PrefabInternal: {fileID: 1667706731}
-  m_Script: {fileID: 11500000, guid: 294f30c17cc704840874698df4e121b5, type: 3}
---- !u!1001 &1667706731
+--- !u!1001 &1768856322
 Prefab:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -265,51 +259,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 114655927034088496, guid: 96808c74c137895438552fd5f969abe6,
-        type: 2}
-      propertyPath: _screen
-      value: 
-      objectReference: {fileID: 1272255410}
-    - target: {fileID: 114640157813931666, guid: 96808c74c137895438552fd5f969abe6,
-        type: 2}
-      propertyPath: _screen
-      value: 
-      objectReference: {fileID: 1272255410}
-    - target: {fileID: 114716161931914044, guid: 96808c74c137895438552fd5f969abe6,
-        type: 2}
-      propertyPath: _screen
-      value: 
-      objectReference: {fileID: 1272255410}
-    - target: {fileID: 114354694745270128, guid: 96808c74c137895438552fd5f969abe6,
-        type: 2}
-      propertyPath: _screen
-      value: 
-      objectReference: {fileID: 1272255410}
-    - target: {fileID: 114482940922277584, guid: 96808c74c137895438552fd5f969abe6,
-        type: 2}
-      propertyPath: _screen
-      value: 
-      objectReference: {fileID: 1272255410}
-    - target: {fileID: 114342672217777724, guid: 96808c74c137895438552fd5f969abe6,
-        type: 2}
-      propertyPath: _screen
-      value: 
-      objectReference: {fileID: 1272255410}
-    - target: {fileID: 114880828455689614, guid: 96808c74c137895438552fd5f969abe6,
-        type: 2}
-      propertyPath: _screen
-      value: 
-      objectReference: {fileID: 1272255410}
-    - target: {fileID: 114096621522101522, guid: 96808c74c137895438552fd5f969abe6,
-        type: 2}
-      propertyPath: _screen
-      value: 
-      objectReference: {fileID: 1272255410}
-    - target: {fileID: 114200870073497730, guid: 96808c74c137895438552fd5f969abe6,
-        type: 2}
-      propertyPath: _screen
-      value: 
-      objectReference: {fileID: 1272255410}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 96808c74c137895438552fd5f969abe6, type: 2}
   m_IsPrefabParent: 0

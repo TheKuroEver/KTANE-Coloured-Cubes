@@ -42,24 +42,25 @@ public class ColouredCubesModule : MonoBehaviour
     {
 		foreach (ColouredCube cube in Cubes)
 		{
-			cube.GetComponentInParent<KMSelectable>().OnInteract += delegate () { CubePress(cube); return false; };
-			cube.GetComponentInParent<KMSelectable>().OnHighlight += delegate () { Screen.DisplayColourName(cube); };
-			cube.GetComponentInParent<KMSelectable>().OnHighlightEnded += delegate () { Screen.StopDisplayingColourName(); };
+			cube.GetComponent<KMSelectable>().OnInteract += delegate () { CubePress(cube); return false; };
+			cube.GetComponent<KMSelectable>().OnHighlight += delegate () { Screen.DisplayColourName(cube); };
+			cube.GetComponent<KMSelectable>().OnHighlightEnded += delegate () { Screen.StopDisplayingColourName(); };
 		}
 
 		foreach (StageLight light in StageLights)
 		{
-			light.GetComponentInParent<KMSelectable>().OnInteract += delegate () { StageLightPress(light); return false; };
-			light.GetComponentInParent<KMSelectable>().OnHighlight += delegate () { Screen.DisplayColourName(light); };
-			light.GetComponentInParent<KMSelectable>().OnHighlightEnded += delegate () { Screen.StopDisplayingColourName(); };
+			light.GetComponent<KMSelectable>().OnInteract += delegate () { StageLightPress(light); return false; };
+			light.GetComponent<KMSelectable>().OnHighlight += delegate () { Screen.DisplayColourName(light); };
+			light.GetComponent<KMSelectable>().OnHighlightEnded += delegate () { Screen.StopDisplayingColourName(); };
 		}
 
-		Screen.GetComponentInParent<KMSelectable>().OnInteract += delegate () { ScreenPress(); return false; };
+		Screen.GetComponent<KMSelectable>().OnInteract += delegate () { ScreenPress(); return false; };
 	}
 
 	void Start()
 	{
 		GenerateStages();
+		Debug.LogFormat("[Coloured Cubes #{0}] Press the screen the start.", ModuleId);
 	}
 
 	void GenerateStages()
@@ -76,6 +77,10 @@ public class ColouredCubesModule : MonoBehaviour
 		int stageTwoSize = Bomb.GetIndicators().Count() % 3;
 		Color[] stageTwoColours = new Color[3];
 
+		int[] stageOnePositions = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+		int[] stageTwoPositions = stageOnePositions;
+		int[] stageThreePositions = stageOnePositions;
+
 		for (int i = 0; i < 3; i++)
         {
 			stageOneColours[i] = new Color(i == stageOneRed ? 1 : 0, i == stageOneGreen ? 1 : 0, i == stageOneBlue ? 1 : 0);
@@ -84,9 +89,9 @@ public class ColouredCubesModule : MonoBehaviour
 
 		_stageThreeHiddenValue = SET.FindSetWith(new SetValue(stageOneRed, stageOneGreen, stageOneBlue, stageTwoSize), new SetValue(stageTwoRed, stageTwoGreen, stageTwoBlue, stageTwoSize));
 
-		_stages[0] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9), SET.MostRecentCorrectPositions.ToArray(), stageOneColours);
-		_stages[1] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9), SET.MostRecentCorrectPositions.ToArray(), stageTwoColours);
-		_stages[2] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9, _stageThreeHiddenValue), SET.MostRecentCorrectPositions.ToArray());
+		_stages[0] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9), SET.MostRecentCorrectPositions.ToArray(), stageOnePositions, stageOneColours);
+		_stages[1] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9), SET.MostRecentCorrectPositions.ToArray(), stageTwoPositions, stageTwoColours);
+		_stages[2] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9, _stageThreeHiddenValue), SET.MostRecentCorrectPositions.ToArray(), stageThreePositions);
 
 		// _stageTwoCycles = PermsManager.GenerateCycles();
 	}
@@ -103,20 +108,37 @@ public class ColouredCubesModule : MonoBehaviour
 
 	void ScreenPress()
     {
-		ColouredCube.ShrinkAndMakeWhite(Cubes);
+
+	}
+
+	void DoStageOneLogging()
+    {
+		int[] correctPositions = _stages[0].CorrectPositions;
+
+		Debug.LogFormat("[Coloured Cubes #{0}] Set values are in red-green-blue-size order.", ModuleId);
+		Debug.LogFormat("[Coloured Cubes #{0}] Stage 1:", ModuleId);
+
+		for (int i = 0; i < 9; i++)
+        {
+			Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its actual values are {4}.", ModuleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), _stages[0].AllValues[i]);
+		}
+
+		Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
     }
 
 	private class StageInfo
 	{ 
 		private readonly SetValue[] _allValues;
 		private readonly int[] _correctPositions;
+		private readonly int[] _truePositions;
 		private readonly Color[] _stageLightColours;
 
 		public SetValue[] AllValues { get { return _allValues; } }
 		public int[] CorrectPositions { get { return _correctPositions; } }
+		public int[] TruePositions { get { return _truePositions; } }
 		public Color[] StageLightColours { get { return _stageLightColours; } }
 
-		public StageInfo(SetValue[] allValues, int[] correctPositions, Color[] stageLightColours = null)
+		public StageInfo(SetValue[] allValues, int[] correctPositions, int[] truePositions, Color[] stageLightColours = null)
         {
 			if (allValues.Length != 9) { throw new ArgumentException("A stage needs exactly 9 set values."); }
 			if (correctPositions.Length != 2 && correctPositions.Length != 3) { throw new ArgumentException("A stage needs exactly 2 or 3 correct set values."); }
@@ -124,6 +146,7 @@ public class ColouredCubesModule : MonoBehaviour
 
 			_allValues = allValues;
 			_correctPositions = correctPositions;
+			_truePositions = truePositions;
 			_stageLightColours = stageLightColours;
 
 			if (_stageLightColours == null) { _stageLightColours = new Color[] { Color.black, Color.black, Color.black }; }

@@ -12,7 +12,7 @@ public class StageLight : MonoBehaviour, IColouredItem
 	[SerializeField] private MeshRenderer _stageLightRenderer;
 	private string _colourName = "Black";
 
-	private readonly Dictionary<string, string> BinaryColourValuesToName = new Dictionary<string, string>()
+	private static readonly Dictionary<string, string> BinaryColourValuesToName = new Dictionary<string, string>()
 	{
 		{ "000", "Black" },
 		{ "001", "Blue" },
@@ -26,9 +26,17 @@ public class StageLight : MonoBehaviour, IColouredItem
 
 	public string ColourName { get { return _colourName; } }
 
-	public void SetColour(Color colour)
+	void Awake()
     {
-		_stageLightRenderer.material.color = colour;
-		_colourName = BinaryColourValuesToName[colour.r.ToString() + colour.g.ToString() + colour.b.ToString()];
+		_stageLightRenderer = GetComponent<MeshRenderer>();
+    }
+
+	public static void SetColours(StageLight[] lights, Color[] colours)
+    {
+		for (int i = 0; i < 3; i++)
+        {
+			lights[i]._stageLightRenderer.material.color = colours[i];
+			lights[i]._colourName = BinaryColourValuesToName[colours[i].r.ToString() + colours[i].g.ToString() + colours[i].b.ToString()];
+		}
     }
 }

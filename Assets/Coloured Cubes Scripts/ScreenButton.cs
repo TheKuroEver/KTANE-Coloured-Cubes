@@ -9,7 +9,7 @@ using Rnd = UnityEngine.Random;
 
 public class ScreenButton : MonoBehaviour
 {
-	[SerializeField] private TextMesh _screenText;
+	private TextMesh _screenText;
 
 	private IColouredItem _buttonToWatch;
 
@@ -20,6 +20,11 @@ public class ScreenButton : MonoBehaviour
 	private bool _showOverride;
 
 	public string DefaultText { set { _defaultText = value; UpdateText(); } }
+
+	void Awake()
+    {
+		_screenText = GetComponentInChildren<TextMesh>();
+    }
 
 	public void UpdateText()
     {
