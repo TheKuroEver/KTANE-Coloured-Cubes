@@ -19,7 +19,7 @@ public class ColouredCubesModule : MonoBehaviour
 	public ScreenButton Screen;
 
 	public Set SET;
-	public PermsManager PermsGenerator;
+	public Permutations PermGenerator;
 
 	private static int ModuleIdCounter = 1;
 	private int ModuleId;
@@ -107,13 +107,29 @@ public class ColouredCubesModule : MonoBehaviour
 
 	void StageLightPress(StageLight light)
     {
-		if (_allowButtonInteraction) { return; }
+		if (!_allowButtonInteraction) { return; }
     }
 
 	void ScreenPress()
     {
-		if (_allowButtonInteraction) { return; }
-	}
+		string test = "";
+
+		if (!_allowButtonInteraction) { return; }
+
+		PermGenerator.GeneratePermutation(9, 3);
+
+		foreach (int element in PermGenerator.Permutation)
+        {
+			test += ((Position)element).ToString() + " ";
+        }
+
+		Debug.Log(test);
+
+		foreach (Cycle cycle in PermGenerator.DisjointCycles)
+        {
+			Debug.Log(cycle.ToString());
+        }
+    }
 
 	void DoStageOneLogging()
     {
@@ -155,5 +171,20 @@ public class ColouredCubesModule : MonoBehaviour
 
 			if (_stageLightColours == null) { _stageLightColours = new Color[] { Color.black, Color.black, Color.black }; }
         }
+	}
+
+
+#pragma warning disable 414
+	private readonly string TwitchHelpMessage = @"Use !{0} to do something.";
+#pragma warning restore 414
+
+	IEnumerator ProcessTwitchCommand(string Command)
+	{
+		yield return null;
+	}
+
+	IEnumerator TwitchHandleForcedSolve()
+	{
+		yield return null;
 	}
 }

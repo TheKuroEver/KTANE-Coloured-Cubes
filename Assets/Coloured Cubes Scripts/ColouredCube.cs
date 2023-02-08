@@ -308,6 +308,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         _highlightRenderer.enabled = value;
         _selected = value;
     }
+
 }
 
 public enum Position
