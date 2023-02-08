@@ -10,6 +10,8 @@ using Rnd = UnityEngine.Random;
 public class StageLight : MonoBehaviour, IColouredItem
 {
 	[SerializeField] private MeshRenderer _stageLightRenderer;
+	[SerializeField] private int _stageNumber;
+
 	private string _colourName = "Black";
 
 	private static readonly Dictionary<string, string> BinaryColourValuesToName = new Dictionary<string, string>()
@@ -25,6 +27,7 @@ public class StageLight : MonoBehaviour, IColouredItem
 	};
 
 	public string ColourName { get { return _colourName; } }
+	public int StageNumber { get { return _stageNumber; } }
 
 	void Awake()
     {

@@ -29,7 +29,11 @@ public class ColouredCubesModule : MonoBehaviour
 	// private Cycle[] _stageTwoCycles;
 	private SetValue _stageThreeHiddenValue;
 
-	private int counter = 0;
+	private int _internalStage = 0;
+	private int _displayedStage = 1;
+
+	private bool _allowButtonInteraction = true; // Refers to the screen and and stage lights.
+	private bool _allowCubeInteraction = false;
 
 	void Awake()
     {
@@ -98,17 +102,17 @@ public class ColouredCubesModule : MonoBehaviour
 
 	void CubePress(ColouredCube cube)
     {
-
+		if (!_allowButtonInteraction || !_allowCubeInteraction) { return; }
     }
 
 	void StageLightPress(StageLight light)
     {
-
+		if (_allowButtonInteraction) { return; }
     }
 
 	void ScreenPress()
     {
-
+		if (_allowButtonInteraction) { return; }
 	}
 
 	void DoStageOneLogging()

@@ -11,6 +11,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
     [SerializeField] private GameObject _cube;
     [SerializeField] private Transform _cubeTransform;
     [SerializeField] private MeshRenderer _cubeRenderer;
+    [SerializeField] private MeshRenderer _highlightRenderer;
 
     private const float _transitionTime = 1;
     private const float _biggestCubeSize = 0.028f;
@@ -30,6 +31,8 @@ public class ColouredCube : MonoBehaviour, IColouredItem
     private bool _isHiding = false;
     private bool _isChangingColour = false;
     private bool _isChangingSize = false;
+
+    private bool _selected = false;
 
     private readonly Dictionary<string, string> TernaryColourValuesToName = new Dictionary<string, string>()
     {
@@ -298,6 +301,12 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         }
 
         _isMoving = false;
+    }
+
+    public void SetHighlight(bool value)
+    {
+        _highlightRenderer.enabled = value;
+        _selected = value;
     }
 }
 
