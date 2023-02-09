@@ -32,10 +32,14 @@ public class ColouredCubesModule : MonoBehaviour
 
 	private int _internalStage = 0;
 	private int _displayedStage = 1;
+	private int _selectionsNeededForSubmission = 3;
+
+	private List<int> _selectedPositions = new List<int>();
 
 	// Both _allowCubeInteraction and _allowButtonInteraction must be true for the cubes to be selectable.
 	private bool _allowButtonInteraction = true;
-	private bool _allowCubeInteraction = false; 
+	private bool _allowCubeInteraction = false;
+	private bool _possibleSubmission = false;
 
 	void Awake()
     {
@@ -66,6 +70,7 @@ public class ColouredCubesModule : MonoBehaviour
 	void Start()
 	{
 		GenerateStages();
+		Screen.DefaultText = "Start";
 		Debug.LogFormat("[Coloured Cubes #{0}] Press the screen the start.", ModuleId);
 	}
 
@@ -123,19 +128,79 @@ public class ColouredCubesModule : MonoBehaviour
 	}
 
 	void CubePress(ColouredCube cube)
-    {
+	{ 
 		if (!_allowButtonInteraction || !_allowCubeInteraction) { return; }
+
+		if (_selectedPositions.Contains(cube.Position))
+        {
+			cube.SetHighlight(false);
+			_selectedPositions.Remove(cube.Position);
+			if (_possibleSubmission) { DisableSubmission(); }
+        }
+        else if (!_possibleSubmission)
+        {
+			cube.SetHighlight(true);
+			_selectedPositions.Add(cube.Position);
+			if (!_possibleSubmission && _selectedPositions.Count() == _selectionsNeededForSubmission) { EnableSubmission(); }
+        }
     }
+
+	void EnableSubmission()
+    {
+		_possibleSubmission = true;
+		Screen.EnableOverrideText("Submit");
+    }
+
+	void DisableSubmission()
+    {
+		_possibleSubmission = false;
+		Screen.DisableOverrideText();
+	}
 
 	void StageLightPress(StageLight light)
     {
 		if (!_allowButtonInteraction) { return; }
     }
 
+
 	void ScreenPress()
     {
 		if (!_allowButtonInteraction) { return; }
+
+		if (_possibleSubmission)
+        {
+			HandleSubmission();
+			return;
+        }
+
+		if (_internalStage == 0)
+        {
+			StartCoroutine(StageOneAnimation());
+        }
     }
+
+	void HandleSubmission()
+    {
+		if (_selectedPositions.Any((position) => !_stages[_internalStage - 1].CorrectPositions.Contains(position)))
+        {
+			Strike();
+        }
+        else
+        {
+			Screen.EnableOverrideText("Correct");
+			_allowButtonInteraction = false;
+        }
+    }
+
+	void Strike()
+    {
+		_selectedPositions.Clear();
+		ColouredCube.Deselect(Cubes);
+		ColouredCube.StrikeFlash(Cubes);
+		DisableSubmission();
+		Module.HandleStrike();
+    }
+
 
 	void DoStageOneLogging()
     {
@@ -150,6 +215,42 @@ public class ColouredCubesModule : MonoBehaviour
 		}
 
 		Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
+    }
+
+	IEnumerator StageOneAnimation()
+    {
+		Screen.EnableOverrideText("...");
+		_allowButtonInteraction = false;
+		_allowCubeInteraction = false;
+
+		ColouredCube.SetHiddenStates(Cubes, false);
+		do { yield return null; } while (ColouredCube.AreBusy(Cubes)); // This causes the coroutine to wait until the cubes stop moving.
+
+		ColouredCube.AssignSetValues(Cubes, _stages[0].AllValues, _stages[0].TruePositions);
+		do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+		StageLight.SetColours(StageLights, _stages[0].StageLightColours);
+		Screen.DefaultText = "Stage 1";
+		Screen.DisableOverrideText();
+		_allowButtonInteraction = true;
+
+		if (_internalStage == 0)
+        {
+			DoStageOneLogging();
+			_internalStage = 1;
+		}
+
+		if (_internalStage == 1) { _allowCubeInteraction = true; }
+    }
+
+	IEnumerator StageTwoAnimation()
+    {
+		yield return null;
+    }
+
+	IEnumerator StageThreeAnimation()
+    {
+		yield return null;
     }
 
 	private class StageInfo
@@ -178,7 +279,6 @@ public class ColouredCubesModule : MonoBehaviour
 			if (_stageLightColours == null) { _stageLightColours = new Color[] { Color.black, Color.black, Color.black }; }
         }
 	}
-
 
 #pragma warning disable 414
 	private readonly string TwitchHelpMessage = @"Use !{0} to do something.";

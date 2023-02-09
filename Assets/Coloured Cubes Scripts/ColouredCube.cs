@@ -32,8 +32,6 @@ public class ColouredCube : MonoBehaviour, IColouredItem
     private bool _isChangingColour = false;
     private bool _isChangingSize = false;
 
-    private bool _selected = false;
-
     private readonly Dictionary<string, string> TernaryColourValuesToName = new Dictionary<string, string>()
     {
         { "000", "Black" },
@@ -66,14 +64,15 @@ public class ColouredCube : MonoBehaviour, IColouredItem
     };
 
     public int Size { get { return _size; } }
+    public int Position { get { return _position; } }
     public string ColourName { get { return _colourName; } }
     public bool IsBusy { get { return _isMoving || _isChangingColour || _isHiding || _isChangingSize; } }
 
     void Start()
     {
         GetPositionFromName();
-        // _cubeTransform.localPosition = new Vector3(_topLeftCubeXValue + _position[1] * _distanceBetweenCubes, _revealedYValue - 0.05f, _topLeftCubeZValue - _position[0] * _distanceBetweenCubes);
-        // _cube.SetActive(false);
+        _cubeTransform.localPosition = new Vector3(_topLeftCubeXValue + GetRowColumn(_position)[1] * _distanceBetweenCubes, _revealedYValue - 0.05f, _topLeftCubeZValue - GetRowColumn(_position)[0] * _distanceBetweenCubes);
+        _cube.SetActive(false);
         Debug.Log(_cubeTransform.name + ":" + (Position)_position);
     }
 
@@ -303,12 +302,19 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         _isMoving = false;
     }
 
+
+    public static void Deselect(ColouredCube[] cubes)
+    {
+        foreach (ColouredCube cube in cubes)
+        {
+            cube.SetHighlight(false);
+        }
+    }
+
     public void SetHighlight(bool value)
     {
         _highlightRenderer.enabled = value;
-        _selected = value;
     }
-
 }
 
 public enum Position
