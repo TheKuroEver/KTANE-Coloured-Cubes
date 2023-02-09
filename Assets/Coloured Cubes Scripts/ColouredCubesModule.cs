@@ -125,7 +125,7 @@ public class ColouredCubesModule : MonoBehaviour
 
 		Debug.Log(test);
 
-		foreach (Cycle cycle in PermGenerator.DisjointCycles)
+		foreach (Cycle cycle in PermGenerator.Cycles)
         {
 			Debug.Log(cycle.ToString());
         }

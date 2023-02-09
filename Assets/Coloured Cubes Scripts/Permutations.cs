@@ -10,10 +10,10 @@ using Rnd = UnityEngine.Random;
 public class Permutations : MonoBehaviour
 {
     private int[] _permutation;
-    private Cycle[] _disjointCycles;
+    private Cycle[] _cycles;
 
     public int[] Permutation { get { return _permutation; } }
-    public Cycle[] DisjointCycles { get { return _disjointCycles; } }
+    public Cycle[] Cycles { get { return _cycles; } }
 
     public void GeneratePermutation(int numOfElements, int maxCycleLength)
     {
@@ -21,6 +21,7 @@ public class Permutations : MonoBehaviour
         int position;
 
         if (numOfElements < 1) { throw new ArgumentException("Cannot generate a permutation with a non-positive number of elements."); }
+        if (maxCycleLength < 2) { throw new ArgumentException("Cannot split a permutation into cycles of length less than 2."); }
 
         _permutation = new int[numOfElements];
         unusedElements = Enumerable.Range(0, _permutation.Length).ToList(); // I don't know how else to do this concisely.
@@ -32,10 +33,11 @@ public class Permutations : MonoBehaviour
             unusedElements.RemoveAt(position);
         }
 
-        _disjointCycles = GetDisjointCycles(maxCycleLength);
+        _cycles = GetDisjointCycles();
+        GetShorterCycles(maxCycleLength);
     }
 
-    private Cycle[] GetDisjointCycles(int maxCycleLength)
+    private Cycle[] GetDisjointCycles()
     { 
         List<int> newCycle;
         var visitedElements = new List<int>();
@@ -62,13 +64,37 @@ public class Permutations : MonoBehaviour
 
         return disjointCycles.ToArray();
     }
+
+    private void GetShorterCycles(int maxCycleLength)
+    {
+        var shorterCycles = new List<Cycle>();
+        int len;
+
+        foreach (Cycle cycle in _cycles)
+        {
+            len = cycle.Length;
+
+            while (len > maxCycleLength)
+            {
+                shorterCycles.Add(new Cycle(cycle.Elements[len - 3], cycle.Elements[len - 2], cycle.Elements[len - 1]));
+                len -= maxCycleLength - 1;
+            }
+
+            shorterCycles.Add(new Cycle(cycle.Elements.Where((element, index) => index < len).ToArray()));
+        }
+
+        _cycles = shorterCycles.ToArray();
+    }
 }
 
-public class Cycle
+public class Cycle // I should probably learn how IEnumerables work.
 {
     private int[] _elements;
 
-    public Cycle(int[] elements)
+    public int[] Elements { get { return _elements; } }
+    public int Length { get { return _elements.Length; } }
+
+    public Cycle(params int[] elements)
     {
         if (elements.Distinct().Count() != elements.Length) { throw new ArgumentException("A cycle cannot include duplicates."); }
 
