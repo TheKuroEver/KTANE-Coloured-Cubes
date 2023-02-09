@@ -26,14 +26,16 @@ public class ColouredCubesModule : MonoBehaviour
 	private bool ModuleSolved = false;
 
 	private StageInfo[] _stages = new StageInfo[3];
-	// private Cycle[] _stageTwoCycles;
+	private Cycle[] _stageTwoCycles;
+	private int[] _stageTwoPermutation;
 	private SetValue _stageThreeHiddenValue;
 
 	private int _internalStage = 0;
 	private int _displayedStage = 1;
 
-	private bool _allowButtonInteraction = true; // Refers to the screen and and stage lights.
-	private bool _allowCubeInteraction = false;
+	// Both _allowCubeInteraction and _allowButtonInteraction must be true for the cubes to be selectable.
+	private bool _allowButtonInteraction = true;
+	private bool _allowCubeInteraction = false; 
 
 	void Awake()
     {
@@ -82,8 +84,8 @@ public class ColouredCubesModule : MonoBehaviour
 		Color[] stageTwoColours = new Color[3];
 
 		int[] stageOnePositions = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-		int[] stageTwoPositions = stageOnePositions;
-		int[] stageThreePositions = stageOnePositions;
+		int[] stageTwoPositions = new int[9];
+		int[] stageThreePositions;
 
 		for (int i = 0; i < 3; i++)
         {
@@ -91,13 +93,33 @@ public class ColouredCubesModule : MonoBehaviour
 			stageTwoColours[i] = new Color(i == stageTwoRed ? 1 : 0, i == stageTwoGreen ? 1 : 0, i == stageTwoBlue ? 1 : 0);
 		}
 
+		PermGenerator.GeneratePermutation(9, 3);
+		_stageTwoPermutation = PermGenerator.Permutation;
+		_stageTwoCycles = PermGenerator.Cycles;
+
+		for (int i = 0; i < 9; i++)
+        {
+			stageTwoPositions[_stageTwoPermutation[i]] = i;
+        }
+
+		stageThreePositions = stageOnePositions.Select((element, index) => FindPositionSet(element, stageTwoPositions[index])).ToArray();
 		_stageThreeHiddenValue = SET.FindSetWith(new SetValue(stageOneRed, stageOneGreen, stageOneBlue, stageTwoSize), new SetValue(stageTwoRed, stageTwoGreen, stageTwoBlue, stageTwoSize));
 
 		_stages[0] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9), SET.MostRecentCorrectPositions.ToArray(), stageOnePositions, stageOneColours);
 		_stages[1] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9), SET.MostRecentCorrectPositions.ToArray(), stageTwoPositions, stageTwoColours);
 		_stages[2] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9, _stageThreeHiddenValue), SET.MostRecentCorrectPositions.ToArray(), stageThreePositions);
+	}
 
-		// _stageTwoCycles = PermsManager.GenerateCycles();
+	int FindPositionSet(int positionOne, int positionTwo)
+    {
+		int rowOne = positionOne / 3;
+		int rowTwo = positionTwo / 3;
+		int rowThree = SET.FindSetWith(new SetValue(rowOne), new SetValue(rowTwo)).Values[0];
+		int columnOne = positionOne % 3;
+		int columnTwo = positionTwo % 3;
+		int columnThree = SET.FindSetWith(new SetValue(columnOne), new SetValue(columnTwo)).Values[0];
+
+		return rowThree * 3 + columnThree;
 	}
 
 	void CubePress(ColouredCube cube)
@@ -112,23 +134,7 @@ public class ColouredCubesModule : MonoBehaviour
 
 	void ScreenPress()
     {
-		string test = "";
-
 		if (!_allowButtonInteraction) { return; }
-
-		PermGenerator.GeneratePermutation(9, 3);
-
-		foreach (int element in PermGenerator.Permutation)
-        {
-			test += ((Position)element).ToString() + " ";
-        }
-
-		Debug.Log(test);
-
-		foreach (Cycle cycle in PermGenerator.Cycles)
-        {
-			Debug.Log(cycle.ToString());
-        }
     }
 
 	void DoStageOneLogging()
