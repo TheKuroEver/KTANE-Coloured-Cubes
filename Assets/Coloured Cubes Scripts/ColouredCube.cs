@@ -270,7 +270,8 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         _isChangingSize = false;
     }
 
-    private void SetPosition(int newPosition)
+
+    public void SetPosition(int newPosition)
     {
         if (_position == newPosition) { return; }
         if (_isMoving) { return; }

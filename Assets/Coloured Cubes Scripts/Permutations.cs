@@ -123,10 +123,10 @@ public class Cycle // I should probably learn how IEnumerables work.
 
         foreach (int element in _elements)
         {
-            cycleAsString += ((Position)element).ToString() + " -> ";
+            cycleAsString += (Position)element + " -> ";
         }
 
-        return cycleAsString + ((Position)_elements[0]).ToString() + " )";
+        return cycleAsString + (Position)_elements[0] + " )";
     }
 
     private string BigCycleToString()

@@ -25,6 +25,8 @@ public class ColouredCubesModule : MonoBehaviour
 	private int ModuleId;
 	private bool ModuleSolved = false;
 
+	private KMSelectable _moduleSelectable;
+
 	private StageInfo[] _stages = new StageInfo[3];
 	private Cycle[] _stageTwoCycles;
 	private int[] _stageTwoPermutation;
@@ -44,6 +46,7 @@ public class ColouredCubesModule : MonoBehaviour
 	void Awake()
     {
 		ModuleId = ModuleIdCounter++;
+		_moduleSelectable = Module.GetComponent<KMSelectable>();
 
 		AssignInteractionHandlers();
 	}
@@ -95,7 +98,7 @@ public class ColouredCubesModule : MonoBehaviour
 		for (int i = 0; i < 3; i++)
         {
 			stageOneColours[i] = new Color(i == stageOneRed ? 1 : 0, i == stageOneGreen ? 1 : 0, i == stageOneBlue ? 1 : 0);
-			stageTwoColours[i] = new Color(i == stageTwoRed ? 1 : 0, i == stageTwoGreen ? 1 : 0, i == stageTwoBlue ? 1 : 0);
+			stageTwoColours[i] = new Color(i == stageTwoRed ? 0 : 1, i == stageTwoGreen ? 0 : 1, i == stageTwoBlue ? 0 : 1);
 		}
 
 		PermGenerator.GeneratePermutation(9, 3);
@@ -184,38 +187,53 @@ public class ColouredCubesModule : MonoBehaviour
 		if (_selectedPositions.Any((position) => !_stages[_internalStage - 1].CorrectPositions.Contains(position)))
         {
 			Strike();
+			return;
         }
-        else
+
+		Debug.LogFormat("[Coloured Cubes #{0}] You submitted the correct cubes.", ModuleId);
+        if (_internalStage == 1)
         {
+			DisableSubmission();
+			StartCoroutine(StageTwoAnimation());
+        }
+		else if (_internalStage == 2)
+        {
+			DisableSubmission();
 			Screen.EnableOverrideText("Correct");
 			_allowButtonInteraction = false;
+			Module.HandlePass();
         }
     }
 
 	void Strike()
     {
-		_selectedPositions.Clear();
-		ColouredCube.Deselect(Cubes);
+		string selectedCubes = "";
+
+		for (int i = 0; i < _selectedPositions.Count(); i++)
+        {
+			if (i == _selectedPositions.Count() - 1)
+            {
+				selectedCubes += "and " + (Position)_selectedPositions[i];
+            }
+            else
+            {
+				selectedCubes += (Position)_selectedPositions[i] + ", ";
+            }
+        }
+		Debug.LogFormat("[Coloured Cubes #{0}] Strike! You selected {1}, which was incorrect.", ModuleId, selectedCubes);
+
+		DeselectCubes();
 		ColouredCube.StrikeFlash(Cubes);
 		DisableSubmission();
 		Module.HandleStrike();
     }
 
-
-	void DoStageOneLogging()
+	void DeselectCubes()
     {
-		int[] correctPositions = _stages[0].CorrectPositions;
+		_selectedPositions.Clear();
+		ColouredCube.Deselect(Cubes);
+	}
 
-		Debug.LogFormat("[Coloured Cubes #{0}] Set values are in red-green-blue-size order.", ModuleId);
-		Debug.LogFormat("[Coloured Cubes #{0}] Stage 1:", ModuleId);
-
-		for (int i = 0; i < 9; i++)
-        {
-			Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its actual values are {4}.", ModuleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), _stages[0].AllValues[i]);
-		}
-
-		Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
-    }
 
 	IEnumerator StageOneAnimation()
     {
@@ -223,6 +241,7 @@ public class ColouredCubesModule : MonoBehaviour
 		_allowButtonInteraction = false;
 		_allowCubeInteraction = false;
 
+		DeselectCubes();
 		ColouredCube.SetHiddenStates(Cubes, false);
 		do { yield return null; } while (ColouredCube.AreBusy(Cubes)); // This causes the coroutine to wait until the cubes stop moving.
 
@@ -243,10 +262,105 @@ public class ColouredCubesModule : MonoBehaviour
 		if (_internalStage == 1) { _allowCubeInteraction = true; }
     }
 
+	void DoStageOneLogging()
+	{
+		int[] correctPositions = _stages[0].CorrectPositions;
+
+		Debug.LogFormat("[Coloured Cubes #{0}] Set values are in red-green-blue-size order.", ModuleId);
+		Debug.LogFormat("[Coloured Cubes #{0}] Stage 1:", ModuleId);
+
+		for (int i = 0; i < 9; i++)
+		{
+			Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its actual values are {4}.", ModuleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), _stages[0].AllValues[i]);
+		}
+
+		Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
+	}
+
 	IEnumerator StageTwoAnimation()
     {
-		yield return null;
+		Screen.EnableOverrideText("...");
+		_allowButtonInteraction = false;
+		_allowCubeInteraction = false;
+
+		DeselectCubes();
+		ColouredCube.ShrinkAndMakeWhite(Cubes);
+		do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+		foreach (Cycle cycle in _stageTwoCycles)
+        {
+			// Reveals cubes that are in the cycle and hides the rest.
+			ColouredCube.SetHiddenStates(Cubes, Cubes.Select((cube, index) => !cycle.Elements.Contains(index)).ToArray());
+			do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+			foreach (int position in cycle.Elements)
+            {
+				Cubes[position].SetPosition(cycle.Permute(position));
+            }
+			do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+			ReorderCubes();
+		}
+
+		ColouredCube.SetHiddenStates(Cubes, false);
+		do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+		ColouredCube.AssignSetValues(Cubes, _stages[1].AllValues, _stages[1].TruePositions);
+		do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+		StageLight.SetColours(StageLights, _stages[1].StageLightColours);
+		Screen.DefaultText = "Stage 2";
+		Screen.DisableOverrideText();
+		_allowButtonInteraction = true;
+
+		if (_internalStage == 1)
+		{
+			DoStageTwoLogging();
+			_internalStage = 2;
+		}
+
+		if (_internalStage == 2) { _allowCubeInteraction = true; }
+	}
+
+	void DoStageTwoLogging()
+    {
+		int[] correctPositions = _stages[1].CorrectPositions;
+
+		Debug.LogFormat("[Coloured Cubes #{0}] Stage 2:", ModuleId);
+		Debug.LogFormat("[Coloured Cubes #{0}] The cycles displayed were:", ModuleId);
+
+		foreach (Cycle cycle in _stageTwoCycles)
+        {
+			Debug.LogFormat("[Coloured Cubes #{0}] {1}", ModuleId, cycle.ToString());
+		}
+
+		for (int i = 0; i < 9; i++)
+		{
+			Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its original position was {4}. Its actual values are {5}.", ModuleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), (Position)_stages[1].TruePositions[i], _stages[1].AllValues[i]);
+		}
+
+		Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
+	}
+
+	void ReorderCubes()
+    {
+		var newCubeOrder = new ColouredCube[9];
+		int row;
+		int column;
+
+		foreach (ColouredCube cube in Cubes)
+        {
+			newCubeOrder[cube.Position] = cube;
+
+			row = cube.Position / 3;
+			column = cube.Position % 3;
+			_moduleSelectable.Children[4 * (row + 1) + column] = cube.GetComponent<KMSelectable>();
+        }
+
+		_moduleSelectable.UpdateChildren();
+		Cubes = newCubeOrder;
     }
+
 
 	IEnumerator StageThreeAnimation()
     {
