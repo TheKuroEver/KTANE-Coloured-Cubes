@@ -127,6 +127,7 @@ public class SetValue : IEquatable<SetValue> {
 
     public int[] Values { get { return _values; } }
 
+    // There are three of these because I was stupid when I wrote this (I'm still stupid).
     public SetValue(List<int> values) {
         _values = values.ToArray();
         CheckValidity();
@@ -134,6 +135,11 @@ public class SetValue : IEquatable<SetValue> {
 
     public SetValue(params int[] values) {
         _values = values;
+        CheckValidity();
+    }
+
+    public SetValue(string values) {
+        _values = values.Select((value) => value - '0').ToArray();
         CheckValidity();
     }
 

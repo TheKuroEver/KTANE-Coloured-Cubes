@@ -21,7 +21,7 @@ public class StageLight : MonoBehaviour, IColouredItem {
         { "011", "Cyan" },
         { "100", "Red" },
         { "101", "Magenta" },
-        { "110", "Green" },
+        { "110", "Yellow" },
         { "111", "White" }
     };
 

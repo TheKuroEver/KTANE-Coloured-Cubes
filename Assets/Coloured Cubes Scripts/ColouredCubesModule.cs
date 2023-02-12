@@ -20,9 +20,24 @@ public class ColouredCubesModule : MonoBehaviour {
     public Set SET;
     public Permutations PermGenerator;
 
+    private readonly string[] _sizeChartColours = new string[] {
+        "210",
+        "201",
+        "021",
+        "120",
+        "012",
+        "102",
+        "211",
+        "121",
+        "112",
+        "212",
+        "221",
+        "122"
+    };
+    private readonly int[] _sizeChartSizes = new int[] { 0, 1, 0, 1, 2, 1, 0, 1, 0 };
+
     private static int ModuleIdCounter = 1;
     private int ModuleId;
-    private bool ModuleSolved = false;
 
     private KMSelectable _moduleSelectable;
 
@@ -147,6 +162,16 @@ public class ColouredCubesModule : MonoBehaviour {
 
     void StageLightPress(StageLight light) {
         if (!_allowButtonInteraction) { return; }
+
+        _displayingSizeChart = false;
+
+        if (light.name == "Stage1Light" && _internalStage >= 1 && _displayedStage != 1) {
+            StartCoroutine(StageOneAnimation());
+        } else if (light.name == "Stage2Light" && _internalStage >= 2) {
+            StartCoroutine(StageTwoAnimation());
+        } else if (light.name == "Stage3Light" && _internalStage >= 3) {
+            StartCoroutine(StageThreeAnimation());
+        }
     }
 
 
@@ -160,6 +185,10 @@ public class ColouredCubesModule : MonoBehaviour {
 
         if (_internalStage == 0) {
             StartCoroutine(StageOneAnimation());
+        } else if (!_displayingSizeChart) {
+            ShowSizeChart();
+        } else {
+            HideSizeChart();
         }
     }
 
@@ -206,10 +235,64 @@ public class ColouredCubesModule : MonoBehaviour {
     }
 
     void SolveModule() {
+        _allowButtonInteraction = false;
+
+        StartCoroutine(SolveAnimation());
         Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", ModuleId);
         Debug.LogFormat("[Coloured Cubes #{0}] Module solved!", ModuleId);
         Module.HandlePass();
+    }
+
+    IEnumerator SolveAnimation() {
+        var solvedSetValues = new SetValue[9];
+
+        for (int i = 0; i < 9; i++) {
+            solvedSetValues[i] = new SetValue("0202");
+        }
+
+        DeselectCubes();
+        ColouredCube.AssignSetValues(Cubes, solvedSetValues);
+        do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+        ColouredCube.SetHiddenStates(Cubes, true);
+    }
+
+    void ShowSizeChart() {
+        int colourNumber = Rnd.Range(0, _sizeChartColours.Length);
+        var setValues = new SetValue[9];
+
+        for (int i = 0; i < 9; i++) {
+            setValues[i] = new SetValue(_sizeChartColours[colourNumber] + _sizeChartSizes[i].ToString());
+        }
+
+        StartCoroutine(SizeChartAnimation(setValues));
+        _displayingSizeChart = true;
+    }
+
+    IEnumerator SizeChartAnimation(SetValue[] setValues) {
+        Screen.EnableOverrideText("...");
         _allowButtonInteraction = false;
+        _allowCubeInteraction = false;
+
+        DeselectCubes();
+        ColouredCube.AssignSetValues(Cubes, setValues);
+        do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+        StageLight.SetColours(StageLights, _stages[2].StageLightColours);
+        Screen.DefaultText = "Size Chart";
+        Screen.DisableOverrideText();
+        _allowButtonInteraction = true;
+    }
+
+    void HideSizeChart() {
+        _displayingSizeChart = false;
+
+        if (_displayedStage == 1) {
+            StartCoroutine(StageOneAnimation());
+        } else if (_displayedStage == 2) {
+            StartCoroutine(StageTwoAnimation(showCycles: false));
+        } else {
+            StartCoroutine(StageThreeAnimation());
+        }
     }
 
 
@@ -217,6 +300,8 @@ public class ColouredCubesModule : MonoBehaviour {
         Screen.EnableOverrideText("...");
         _allowButtonInteraction = false;
         _allowCubeInteraction = false;
+
+        StageLight.SetColours(StageLights, _stages[2].StageLightColours); // Stage 3 light colours are all black.
 
         DeselectCubes();
         ColouredCube.SetHiddenStates(Cubes, false);
@@ -227,6 +312,7 @@ public class ColouredCubesModule : MonoBehaviour {
 
         StageLight.SetColours(StageLights, _stages[0].StageLightColours);
         Screen.DefaultText = "Stage 1";
+        _displayedStage = 1;
         Screen.DisableOverrideText();
         _allowButtonInteraction = true;
 
@@ -254,36 +340,42 @@ public class ColouredCubesModule : MonoBehaviour {
         Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
     }
 
-    IEnumerator StageTwoAnimation() {
+    IEnumerator StageTwoAnimation(bool showCycles = true) {
         Screen.EnableOverrideText("...");
         _allowButtonInteraction = false;
         _allowCubeInteraction = false;
 
+        StageLight.SetColours(StageLights, _stages[2].StageLightColours);
+
         DeselectCubes();
-        ColouredCube.ShrinkAndMakeWhite(Cubes);
-        do { yield return null; } while (ColouredCube.AreBusy(Cubes));
 
-        foreach (Cycle cycle in _stageTwoCycles) {
-            // Reveals cubes that are in the cycle and hides the rest.
-            ColouredCube.SetHiddenStates(Cubes, Cubes.Select((cube, index) => !cycle.Elements.Contains(index)).ToArray());
+        if (showCycles) {
+            ColouredCube.ShrinkAndMakeWhite(Cubes);
             do { yield return null; } while (ColouredCube.AreBusy(Cubes));
 
-            foreach (int position in cycle.Elements) {
-                Cubes[position].SetPosition(cycle.Permute(position));
+            foreach (Cycle cycle in _stageTwoCycles) {
+                // Reveals cubes that are in the cycle and hides the rest.
+                ColouredCube.SetHiddenStates(Cubes, Cubes.Select((cube, index) => !cycle.Elements.Contains(index)).ToArray());
+                do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+                foreach (int position in cycle.Elements) {
+                    Cubes[position].SetPosition(cycle.Permute(position));
+                }
+                do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+                ReorderCubes();
             }
+
+            ColouredCube.SetHiddenStates(Cubes, false);
             do { yield return null; } while (ColouredCube.AreBusy(Cubes));
-
-            ReorderCubes();
         }
-
-        ColouredCube.SetHiddenStates(Cubes, false);
-        do { yield return null; } while (ColouredCube.AreBusy(Cubes));
 
         ColouredCube.AssignSetValues(Cubes, _stages[1].AllValues, _stages[1].TruePositions);
         do { yield return null; } while (ColouredCube.AreBusy(Cubes));
 
         StageLight.SetColours(StageLights, _stages[1].StageLightColours);
         Screen.DefaultText = "Stage 2";
+        _displayedStage = 2;
         Screen.DisableOverrideText();
         _allowButtonInteraction = true;
 
@@ -336,12 +428,14 @@ public class ColouredCubesModule : MonoBehaviour {
         _allowButtonInteraction = false;
         _allowCubeInteraction = false;
 
+        StageLight.SetColours(StageLights, _stages[2].StageLightColours);
+
         DeselectCubes();
         ColouredCube.AssignSetValues(Cubes, _stages[2].AllValues, _stages[2].TruePositions);
         do { yield return null; } while (ColouredCube.AreBusy(Cubes));
 
-        StageLight.SetColours(StageLights, _stages[2].StageLightColours);
         Screen.DefaultText = "Stage 3";
+        _displayedStage = 3;
         Screen.DisableOverrideText();
         _allowButtonInteraction = true;
 
@@ -366,6 +460,7 @@ public class ColouredCubesModule : MonoBehaviour {
         Debug.LogFormat("[Coloured Cubes #{0}] The hidden set value is {1}", ModuleId, _stageThreeHiddenValue);
         Debug.LogFormat("[Coloured Cubes #{0}] {1} and {2} form a set with this value!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1]);
     }
+
 
     private class StageInfo {
         private readonly SetValue[] _allValues;

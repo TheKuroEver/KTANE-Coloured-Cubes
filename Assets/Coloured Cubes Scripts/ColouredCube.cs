@@ -7,17 +7,17 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 public class ColouredCube : MonoBehaviour, IColouredItem {
-    [SerializeField] private GameObject _cube;
-    [SerializeField] private Transform _cubeTransform;
-    [SerializeField] private MeshRenderer _cubeRenderer;
-    [SerializeField] private MeshRenderer _highlightRenderer;
-
     private const float _transitionTime = 1;
     private const float _biggestCubeSize = 0.028f;
     private const float _topLeftCubeXValue = -0.056f;
     private const float _topLeftCubeZValue = 0.014f;
     private const float _revealedYValue = 0.013f;
     private const float _distanceBetweenCubes = 0.035f;
+
+    [SerializeField] private GameObject _cube;
+    [SerializeField] private Transform _cubeTransform;
+    [SerializeField] private MeshRenderer _cubeRenderer;
+    [SerializeField] private MeshRenderer _highlightRenderer;
 
     private int _position; // Position in reading order, starting from 0.
     private int _size = 2;
@@ -132,7 +132,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem {
     }
 
 
-    public static void AssignSetValues(ColouredCube[] cubes, SetValue[] setValues, int[] positions) // Need to add modifierPosition argument.
+    public static void AssignSetValues(ColouredCube[] cubes, SetValue[] setValues, int[] positions) 
     {
         string value;
 
@@ -144,6 +144,17 @@ public class ColouredCube : MonoBehaviour, IColouredItem {
             value = GetModifiedSetValue(setValues[i], positions[i]).ToString();
             cubes[i].SetColour(value.Substring(0, 3));
             cubes[i].SetSize(value[3] - '0');
+        }
+    }
+
+    public static void AssignSetValues(ColouredCube[] cubes, SetValue[] setValues) {
+        if (cubes.Length != setValues.Length) { throw new RankException("Number of cubes and number of set values to set do not match."); }
+
+        for (int i = 0; i < cubes.Length; i++) {
+            if (setValues[i].Values.Length != 4) { throw new ArgumentException("Cubes need set values with exactly four parameters."); }
+
+            cubes[i].SetColour(setValues[i].ToString().Substring(0, 3));
+            cubes[i].SetSize(setValues[i].ToString()[3] - '0');
         }
     }
 
@@ -181,7 +192,6 @@ public class ColouredCube : MonoBehaviour, IColouredItem {
             cube.SetColour(cube._colourValues, true);
         }
     }
-
 
     private void SetColour(string newColour, bool striking = false) {
         if (newColour == _colourValues && !striking) { return; }
