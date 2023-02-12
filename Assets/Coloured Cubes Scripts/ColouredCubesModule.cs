@@ -41,6 +41,7 @@ public class ColouredCubesModule : MonoBehaviour {
     private bool _allowButtonInteraction = true;
     private bool _allowCubeInteraction = false;
     private bool _possibleSubmission = false;
+    private bool _displayingSizeChart = false;
 
     void Awake() {
         ModuleId = ModuleIdCounter++;
@@ -174,9 +175,10 @@ public class ColouredCubesModule : MonoBehaviour {
             StartCoroutine(StageTwoAnimation());
         } else if (_internalStage == 2) {
             DisableSubmission();
-            Screen.EnableOverrideText("Correct");
-            _allowButtonInteraction = false;
-            Module.HandlePass();
+            StartCoroutine(StageThreeAnimation());
+            _selectionsNeededForSubmission = 2;
+        } else {
+            SolveModule();
         }
     }
 
@@ -201,6 +203,13 @@ public class ColouredCubesModule : MonoBehaviour {
     void DeselectCubes() {
         _selectedPositions.Clear();
         ColouredCube.Deselect(Cubes);
+    }
+
+    void SolveModule() {
+        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Module solved!", ModuleId);
+        Module.HandlePass();
+        _allowButtonInteraction = false;
     }
 
 
@@ -233,7 +242,10 @@ public class ColouredCubesModule : MonoBehaviour {
         int[] correctPositions = _stages[0].CorrectPositions;
 
         Debug.LogFormat("[Coloured Cubes #{0}] Set values are in red-green-blue-size order.", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Stage light colours are in 0-1-2 order.", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", ModuleId);
         Debug.LogFormat("[Coloured Cubes #{0}] Stage 1:", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] The stage lights display {1}, {2}, and {3}.", ModuleId, StageLights[0].ColourName.ToLower(), StageLights[1].ColourName.ToLower(), StageLights[2].ColourName.ToLower());
 
         for (int i = 0; i < 9; i++) {
             Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its actual values are {4}.", ModuleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), _stages[0].AllValues[i]);
@@ -286,8 +298,10 @@ public class ColouredCubesModule : MonoBehaviour {
     void DoStageTwoLogging() {
         int[] correctPositions = _stages[1].CorrectPositions;
 
+        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", ModuleId);
         Debug.LogFormat("[Coloured Cubes #{0}] Stage 2:", ModuleId);
-        Debug.LogFormat("[Coloured Cubes #{0}] The cycles displayed were:", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] The stage lights display {1}, {2}, and {3}.", ModuleId, StageLights[0].ColourName.ToLower(), StageLights[1].ColourName.ToLower(), StageLights[2].ColourName.ToLower());
+        Debug.LogFormat("[Coloured Cubes #{0}] The cycles displayed are:", ModuleId);
 
         foreach (Cycle cycle in _stageTwoCycles) {
             Debug.LogFormat("[Coloured Cubes #{0}] {1}", ModuleId, cycle.ToString());
@@ -317,9 +331,40 @@ public class ColouredCubesModule : MonoBehaviour {
         Cubes = newCubeOrder;
     }
 
-
     IEnumerator StageThreeAnimation() {
-        yield return null;
+        Screen.EnableOverrideText("...");
+        _allowButtonInteraction = false;
+        _allowCubeInteraction = false;
+
+        DeselectCubes();
+        ColouredCube.AssignSetValues(Cubes, _stages[2].AllValues, _stages[2].TruePositions);
+        do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+
+        StageLight.SetColours(StageLights, _stages[2].StageLightColours);
+        Screen.DefaultText = "Stage 3";
+        Screen.DisableOverrideText();
+        _allowButtonInteraction = true;
+
+        if (_internalStage == 2) {
+            DoStageThreeLogging();
+            _internalStage = 3;
+        }
+
+        _allowCubeInteraction = true;
+    }
+
+    void DoStageThreeLogging() {
+        int[] correctPositions = _stages[2].CorrectPositions;
+
+        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Stage 3:", ModuleId);
+
+        for (int i = 0; i < 9; i++) {
+            Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its true position is {4}. Its actual values are {5}.", ModuleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), (Position)_stages[2].TruePositions[i], _stages[2].AllValues[i]);
+        }
+
+        Debug.LogFormat("[Coloured Cubes #{0}] The hidden set value is {1}", ModuleId, _stageThreeHiddenValue);
+        Debug.LogFormat("[Coloured Cubes #{0}] {1} and {2} form a set with this value!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1]);
     }
 
     private class StageInfo {
