@@ -6,8 +6,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
-public class ColouredCube : MonoBehaviour, IColouredItem
-{
+public class ColouredCube : MonoBehaviour, IColouredItem {
     [SerializeField] private GameObject _cube;
     [SerializeField] private Transform _cubeTransform;
     [SerializeField] private MeshRenderer _cubeRenderer;
@@ -68,50 +67,41 @@ public class ColouredCube : MonoBehaviour, IColouredItem
     public string ColourName { get { return _colourName; } }
     public bool IsBusy { get { return _isMoving || _isChangingColour || _isHiding || _isChangingSize; } }
 
-    void Start()
-    {
+    void Start() {
         GetPositionFromName();
         _cubeTransform.localPosition = new Vector3(_topLeftCubeXValue + GetRowColumn(_position)[1] * _distanceBetweenCubes, _revealedYValue - 0.05f, _topLeftCubeZValue - GetRowColumn(_position)[0] * _distanceBetweenCubes);
         _cube.SetActive(false);
         Debug.Log(_cubeTransform.name + ":" + (Position)_position);
     }
 
-    private void SetActive(bool state = true)
-    {
+    private void SetActive(bool state = true) {
         _cube.SetActive(state);
     }
 
-    private void GetPositionFromName()
-    {
+    private void GetPositionFromName() {
         _position = 3 * "123".IndexOf(_cubeTransform.name[1]) + "ABC".IndexOf(_cubeTransform.name[0]);
     }
 
-    public static bool AreBusy(ColouredCube[] cubes)
-    {
+    public static bool AreBusy(ColouredCube[] cubes) {
         return cubes.Any(cube => cube.IsBusy);
     }
 
 
-    public static void SetHiddenStates(ColouredCube[] cubes, bool newState, float transitionTime = _transitionTime)
-    {
-        foreach (ColouredCube cube in cubes)
-        {
+    public static void SetHiddenStates(ColouredCube[] cubes, bool newState, float transitionTime = _transitionTime) {
+        foreach (ColouredCube cube in cubes) {
             cube.SetHiddenState(newState, transitionTime);
         }
     }
 
-    public static void SetHiddenStates(ColouredCube[] cubes, bool[] newStates, float transitionTime = _transitionTime)
-    {
+    public static void SetHiddenStates(ColouredCube[] cubes, bool[] newStates, float transitionTime = _transitionTime) {
         if (cubes.Length != newStates.Length) { throw new RankException("Number of cubes and number of states to set do not match."); }
 
-        for (int i = 0; i < cubes.Length; i++)
-        {
+        for (int i = 0; i < cubes.Length; i++) {
             cubes[i].SetHiddenState(newStates[i], transitionTime);
         }
     }
 
-    private void SetHiddenState(bool newState, float transitionTime)
-    {
+    private void SetHiddenState(bool newState, float transitionTime) {
         if (newState == _isHidden) { return; }
         if (_isHiding) { return; }
 
@@ -121,8 +111,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         StartCoroutine(HidingAnimation(newState, transitionTime));
     }
 
-    private IEnumerator HidingAnimation(bool makeHidden, float transitionTime)
-    {
+    private IEnumerator HidingAnimation(bool makeHidden, float transitionTime) {
         float elapsedTime = 0;
         float transitionProgress;
         float newYValue = makeHidden ? _revealedYValue - 0.05f : _revealedYValue;
@@ -131,8 +120,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
 
         yield return null;
 
-        while (elapsedTime <= transitionTime)
-        {
+        while (elapsedTime <= transitionTime) {
             elapsedTime += Time.deltaTime;
             transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
             _cubeTransform.localPosition = new Vector3(_cubeTransform.localPosition.x, oldYValue + transitionProgress * yValueDifference, _cubeTransform.localPosition.z);
@@ -149,9 +137,8 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         string value;
 
         if (cubes.Length != setValues.Length || cubes.Length != positions.Length) { throw new RankException("Number of cubes and number of set values to set do not match."); }
-        
-        for (int i = 0; i < cubes.Length; i++)
-        {
+
+        for (int i = 0; i < cubes.Length; i++) {
             if (setValues[i].Values.Length != 4) { throw new ArgumentException("Cubes need set values with exactly four parameters."); }
 
             value = GetModifiedSetValue(setValues[i], positions[i]).ToString();
@@ -160,14 +147,12 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         }
     }
 
-    private static SetValue GetModifiedSetValue(SetValue setValue, int position)
-    {
+    private static SetValue GetModifiedSetValue(SetValue setValue, int position) {
         var modifiedValues = new int[4];
         int row = GetRowColumn(position)[0];
         int column = GetRowColumn(position)[1];
 
-        for (int i = 0; i < 3; i++)
-        {
+        for (int i = 0; i < 3; i++) {
             modifiedValues[i] = (row == i) ? (setValue.Values[i] + 1) % 3 : setValue.Values[i];
         }
 
@@ -176,35 +161,29 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         return new SetValue(modifiedValues);
     }
 
-    private static int[] GetRowColumn(int positionNumber)
-    {
+    private static int[] GetRowColumn(int positionNumber) {
         int row = positionNumber / 3;
         int column = positionNumber % 3;
 
         return new int[] { row, column };
     }
 
-    public static void ShrinkAndMakeWhite(ColouredCube[] cubes)
-    {
-        foreach (ColouredCube cube in cubes)
-        {
+    public static void ShrinkAndMakeWhite(ColouredCube[] cubes) {
+        foreach (ColouredCube cube in cubes) {
             cube.SetColour("222");
             cube.SetSize(0);
         }
     }
 
-    public static void StrikeFlash(ColouredCube[] cubes)
-    {
-        foreach (ColouredCube cube in cubes)
-        {
+    public static void StrikeFlash(ColouredCube[] cubes) {
+        foreach (ColouredCube cube in cubes) {
             cube._cubeRenderer.material.color = Color.red;
             cube.SetColour(cube._colourValues, true);
         }
     }
 
 
-    private void SetColour(string newColour, bool striking = false)
-    {
+    private void SetColour(string newColour, bool striking = false) {
         if (newColour == _colourValues && !striking) { return; }
         if (_isChangingColour) { return; }
 
@@ -214,8 +193,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         StartCoroutine(ColourChangeAnimation(newColour));
     }
 
-    private IEnumerator ColourChangeAnimation(string newColour)
-    {
+    private IEnumerator ColourChangeAnimation(string newColour) {
         float elapsedTime = 0;
         float transitionProgress;
         float oldRed = _cubeRenderer.material.color.r;
@@ -227,8 +205,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
 
         yield return null;
 
-        while (elapsedTime / _transitionTime <= 1)
-        {
+        while (elapsedTime / _transitionTime <= 1) {
             elapsedTime += Time.deltaTime;
             transitionProgress = Mathf.Min(elapsedTime / _transitionTime, 1);
             _cubeRenderer.material.color = new Color(oldRed + transitionProgress * redDifference, oldGreen + transitionProgress * greenDifference, oldBlue + transitionProgress * blueDifference);
@@ -238,8 +215,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         _isChangingColour = false;
     }
 
-    private void SetSize(int newSize)
-    {
+    private void SetSize(int newSize) {
         if (_size == newSize) { return; }
         if (_isChangingSize) { return; }
 
@@ -248,8 +224,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         StartCoroutine(SizeChangeAnimation(newSize));
     }
 
-    private IEnumerator SizeChangeAnimation(int newSize)
-    {
+    private IEnumerator SizeChangeAnimation(int newSize) {
         float elapsedTime = 0;
         float transitionProgress;
         float oldSize = _cubeTransform.localScale.x;
@@ -258,8 +233,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
 
         yield return null;
 
-        while (elapsedTime / _transitionTime <= 1)
-        {
+        while (elapsedTime / _transitionTime <= 1) {
             elapsedTime += Time.deltaTime;
             transitionProgress = Mathf.Min(elapsedTime / _transitionTime, 1);
             currentSize = oldSize + transitionProgress * sizeDifference;
@@ -271,8 +245,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
     }
 
 
-    public void SetPosition(int newPosition)
-    {
+    public void SetPosition(int newPosition) {
         if (_position == newPosition) { return; }
         if (_isMoving) { return; }
 
@@ -281,8 +254,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
         StartCoroutine(MoveAnimation(GetRowColumn(newPosition)));
     }
 
-    private IEnumerator MoveAnimation(int[] newPosition)
-    {
+    private IEnumerator MoveAnimation(int[] newPosition) {
         float elapsedTime = 0;
         float transitionProgress;
         float oldX = _cubeTransform.localPosition.x;
@@ -292,8 +264,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem
 
         yield return null;
 
-        while (elapsedTime / _transitionTime <= 1)
-        {
+        while (elapsedTime / _transitionTime <= 1) {
             elapsedTime += Time.deltaTime;
             transitionProgress = Mathf.Min(elapsedTime / _transitionTime, 1);
             _cubeTransform.localPosition = new Vector3(oldX + transitionProgress * xDifference, _cubeTransform.localPosition.y, oldZ + transitionProgress * zDifference);
@@ -304,22 +275,18 @@ public class ColouredCube : MonoBehaviour, IColouredItem
     }
 
 
-    public static void Deselect(ColouredCube[] cubes)
-    {
-        foreach (ColouredCube cube in cubes)
-        {
+    public static void Deselect(ColouredCube[] cubes) {
+        foreach (ColouredCube cube in cubes) {
             cube.SetHighlight(false);
         }
     }
 
-    public void SetHighlight(bool value)
-    {
+    public void SetHighlight(bool value) {
         _highlightRenderer.enabled = value;
     }
 }
 
-public enum Position
-{ 
+public enum Position {
     A1,
     B1,
     C1,
@@ -331,8 +298,7 @@ public enum Position
     C3
 }
 
-public enum Size
-{
+public enum Size {
     small,
     medium,
     big

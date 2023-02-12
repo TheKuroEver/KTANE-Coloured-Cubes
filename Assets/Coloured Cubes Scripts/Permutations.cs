@@ -7,16 +7,14 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class Permutations : MonoBehaviour
-{
+public class Permutations : MonoBehaviour {
     private int[] _permutation;
     private Cycle[] _cycles;
 
     public int[] Permutation { get { return _permutation; } }
     public Cycle[] Cycles { get { return _cycles; } }
 
-    public void GeneratePermutation(int numOfElements, int maxCycleLength)
-    {
+    public void GeneratePermutation(int numOfElements, int maxCycleLength) {
         List<int> unusedElements;
         int position;
 
@@ -26,8 +24,7 @@ public class Permutations : MonoBehaviour
         _permutation = new int[numOfElements];
         unusedElements = Enumerable.Range(0, _permutation.Length).ToList(); // I don't know how else to do this concisely.
 
-        for (int i = 0; i < numOfElements; i++)
-        {
+        for (int i = 0; i < numOfElements; i++) {
             position = Rnd.Range(0, unusedElements.Count());
             _permutation[i] = unusedElements[position];
             unusedElements.RemoveAt(position);
@@ -37,21 +34,18 @@ public class Permutations : MonoBehaviour
         GetShorterCycles(maxCycleLength);
     }
 
-    private Cycle[] GetDisjointCycles()
-    { 
+    private Cycle[] GetDisjointCycles() {
         List<int> newCycle;
         var visitedElements = new List<int>();
         var disjointCycles = new List<Cycle>();
         int lastAddedElement;
 
-        for (int i = 0; i < _permutation.Length; i++)
-        {
+        for (int i = 0; i < _permutation.Length; i++) {
             if (visitedElements.Contains(i) || _permutation[i] == i) { continue; }
 
             newCycle = new List<int>() { i };
 
-            do
-            {
+            do {
                 lastAddedElement = newCycle[newCycle.Count() - 1];
                 visitedElements.Add(lastAddedElement);
                 newCycle.Add(_permutation[lastAddedElement]);
@@ -65,17 +59,14 @@ public class Permutations : MonoBehaviour
         return disjointCycles.ToArray();
     }
 
-    private void GetShorterCycles(int maxCycleLength)
-    {
+    private void GetShorterCycles(int maxCycleLength) {
         var shorterCycles = new List<Cycle>();
         int len;
 
-        foreach (Cycle cycle in _cycles)
-        {
+        foreach (Cycle cycle in _cycles) {
             len = cycle.Length;
 
-            while (len > maxCycleLength)
-            {
+            while (len > maxCycleLength) {
                 shorterCycles.Add(new Cycle(cycle.Elements[len - 3], cycle.Elements[len - 2], cycle.Elements[len - 1]));
                 len -= maxCycleLength - 1;
             }
@@ -94,15 +85,13 @@ public class Cycle // I should probably learn how IEnumerables work.
     public int[] Elements { get { return _elements; } }
     public int Length { get { return _elements.Length; } }
 
-    public Cycle(params int[] elements)
-    {
+    public Cycle(params int[] elements) {
         if (elements.Distinct().Count() != elements.Length) { throw new ArgumentException("A cycle cannot include duplicates."); }
 
         _elements = elements;
     }
 
-    public int Permute(int element)
-    {
+    public int Permute(int element) {
         int index;
 
         // Typically, trying to cycle an element that is not in the cycle returns back the element. However, in this context that
@@ -113,28 +102,24 @@ public class Cycle // I should probably learn how IEnumerables work.
         return _elements[index];
     }
 
-    public override string ToString()
-    {
+    public override string ToString() {
         string cycleAsString;
 
         if (_elements.Length > 9) { return BigCycleToString(); }
 
         cycleAsString = "( ";
 
-        foreach (int element in _elements)
-        {
+        foreach (int element in _elements) {
             cycleAsString += (Position)element + " -> ";
         }
 
         return cycleAsString + (Position)_elements[0] + " )";
     }
 
-    private string BigCycleToString()
-    {
+    private string BigCycleToString() {
         string cycleAsString = "( ";
 
-        foreach (int element in _elements)
-        {
+        foreach (int element in _elements) {
             cycleAsString += element.ToString() + " -> ";
         }
 
