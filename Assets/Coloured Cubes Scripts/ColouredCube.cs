@@ -294,6 +294,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem {
     public void SetHighlight(bool value) {
         _highlightRenderer.enabled = value;
     }
+
 }
 
 public enum Position {

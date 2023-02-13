@@ -20,6 +20,23 @@ public class ColouredCubesModule : MonoBehaviour {
     public Set SET;
     public Permutations PermGenerator;
 
+    private readonly string[] _twitchCubeCommandList = new string[] {
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+    };
+    private readonly string[] _twitchButtonCommandList = new string[] {
+        "S1",
+        "S2",
+        "S3",
+        "SCREEN"
+    };
     private readonly string[] _sizeChartColours = new string[] {
         "210",
         "201",
@@ -36,8 +53,9 @@ public class ColouredCubesModule : MonoBehaviour {
     };
     private readonly int[] _sizeChartSizes = new int[] { 0, 1, 0, 1, 2, 1, 0, 1, 0 };
 
-    private static int ModuleIdCounter = 1;
-    private int ModuleId;
+    private static int s_moduleIdCounter = 1;
+    private int _moduleId;
+    private bool _moduleSolved = false;
 
     private KMSelectable _moduleSelectable;
 
@@ -59,7 +77,7 @@ public class ColouredCubesModule : MonoBehaviour {
     private bool _displayingSizeChart = false;
 
     void Awake() {
-        ModuleId = ModuleIdCounter++;
+        _moduleId = s_moduleIdCounter++;
         _moduleSelectable = Module.GetComponent<KMSelectable>();
 
         AssignInteractionHandlers();
@@ -84,7 +102,7 @@ public class ColouredCubesModule : MonoBehaviour {
     void Start() {
         GenerateStages();
         Screen.DefaultText = "Start";
-        Debug.LogFormat("[Coloured Cubes #{0}] Press the screen the start.", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Press the screen the start.", _moduleId);
     }
 
     void GenerateStages() {
@@ -198,7 +216,7 @@ public class ColouredCubesModule : MonoBehaviour {
             return;
         }
 
-        Debug.LogFormat("[Coloured Cubes #{0}] You submitted the correct cubes.", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] You submitted the correct cubes.", _moduleId);
         if (_internalStage == 1) {
             DisableSubmission();
             StartCoroutine(StageTwoAnimation());
@@ -221,7 +239,7 @@ public class ColouredCubesModule : MonoBehaviour {
                 selectedCubes += (Position)_selectedPositions[i] + ", ";
             }
         }
-        Debug.LogFormat("[Coloured Cubes #{0}] Strike! You selected {1}, which was incorrect.", ModuleId, selectedCubes);
+        Debug.LogFormat("[Coloured Cubes #{0}] Strike! You selected {1}, which was incorrect.", _moduleId, selectedCubes);
 
         DeselectCubes();
         ColouredCube.StrikeFlash(Cubes);
@@ -236,10 +254,11 @@ public class ColouredCubesModule : MonoBehaviour {
 
     void SolveModule() {
         _allowButtonInteraction = false;
+        _moduleSolved = true;
 
         StartCoroutine(SolveAnimation());
-        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", ModuleId);
-        Debug.LogFormat("[Coloured Cubes #{0}] Module solved!", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", _moduleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Module solved!", _moduleId);
         Module.HandlePass();
     }
 
@@ -327,17 +346,17 @@ public class ColouredCubesModule : MonoBehaviour {
     void DoStageOneLogging() {
         int[] correctPositions = _stages[0].CorrectPositions;
 
-        Debug.LogFormat("[Coloured Cubes #{0}] Set values are in red-green-blue-size order.", ModuleId);
-        Debug.LogFormat("[Coloured Cubes #{0}] Stage light colours are in 0-1-2 order.", ModuleId);
-        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", ModuleId);
-        Debug.LogFormat("[Coloured Cubes #{0}] Stage 1:", ModuleId);
-        Debug.LogFormat("[Coloured Cubes #{0}] The stage lights display {1}, {2}, and {3}.", ModuleId, StageLights[0].ColourName.ToLower(), StageLights[1].ColourName.ToLower(), StageLights[2].ColourName.ToLower());
+        Debug.LogFormat("[Coloured Cubes #{0}] Set values are in red-green-blue-size order.", _moduleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Stage light colours are in 0-1-2 order.", _moduleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", _moduleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Stage 1:", _moduleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] The stage lights display {1}, {2}, and {3}.", _moduleId, StageLights[0].ColourName.ToLower(), StageLights[1].ColourName.ToLower(), StageLights[2].ColourName.ToLower());
 
         for (int i = 0; i < 9; i++) {
-            Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its actual values are {4}.", ModuleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), _stages[0].AllValues[i]);
+            Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its actual values are {4}.", _moduleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), _stages[0].AllValues[i]);
         }
 
-        Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
+        Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", _moduleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
     }
 
     IEnumerator StageTwoAnimation(bool showCycles = true) {
@@ -390,20 +409,20 @@ public class ColouredCubesModule : MonoBehaviour {
     void DoStageTwoLogging() {
         int[] correctPositions = _stages[1].CorrectPositions;
 
-        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", ModuleId);
-        Debug.LogFormat("[Coloured Cubes #{0}] Stage 2:", ModuleId);
-        Debug.LogFormat("[Coloured Cubes #{0}] The stage lights display {1}, {2}, and {3}.", ModuleId, StageLights[0].ColourName.ToLower(), StageLights[1].ColourName.ToLower(), StageLights[2].ColourName.ToLower());
-        Debug.LogFormat("[Coloured Cubes #{0}] The cycles displayed are:", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", _moduleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Stage 2:", _moduleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] The stage lights display {1}, {2}, and {3}.", _moduleId, StageLights[0].ColourName.ToLower(), StageLights[1].ColourName.ToLower(), StageLights[2].ColourName.ToLower());
+        Debug.LogFormat("[Coloured Cubes #{0}] The cycles displayed are:", _moduleId);
 
         foreach (Cycle cycle in _stageTwoCycles) {
-            Debug.LogFormat("[Coloured Cubes #{0}] {1}", ModuleId, cycle.ToString());
+            Debug.LogFormat("[Coloured Cubes #{0}] {1}", _moduleId, cycle.ToString());
         }
 
         for (int i = 0; i < 9; i++) {
-            Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its original position was {4}. Its actual values are {5}.", ModuleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), (Position)_stages[1].TruePositions[i], _stages[1].AllValues[i]);
+            Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its original position was {4}. Its actual values are {5}.", _moduleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), (Position)_stages[1].TruePositions[i], _stages[1].AllValues[i]);
         }
 
-        Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
+        Debug.LogFormat("[Coloured Cubes #{0}] {1}, {2}, and {3} form a set!", _moduleId, (Position)correctPositions[0], (Position)correctPositions[1], (Position)correctPositions[2]);
     }
 
     void ReorderCubes() {
@@ -450,15 +469,15 @@ public class ColouredCubesModule : MonoBehaviour {
     void DoStageThreeLogging() {
         int[] correctPositions = _stages[2].CorrectPositions;
 
-        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", ModuleId);
-        Debug.LogFormat("[Coloured Cubes #{0}] Stage 3:", ModuleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", _moduleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Stage 3:", _moduleId);
 
         for (int i = 0; i < 9; i++) {
-            Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its true position is {4}. Its actual values are {5}.", ModuleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), (Position)_stages[2].TruePositions[i], _stages[2].AllValues[i]);
+            Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its true position is {4}. Its actual values are {5}.", _moduleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), (Position)_stages[2].TruePositions[i], _stages[2].AllValues[i]);
         }
 
-        Debug.LogFormat("[Coloured Cubes #{0}] The hidden set value is {1}", ModuleId, _stageThreeHiddenValue);
-        Debug.LogFormat("[Coloured Cubes #{0}] {1} and {2} form a set with this value!", ModuleId, (Position)correctPositions[0], (Position)correctPositions[1]);
+        Debug.LogFormat("[Coloured Cubes #{0}] The hidden set value is {1}", _moduleId, _stageThreeHiddenValue);
+        Debug.LogFormat("[Coloured Cubes #{0}] {1} and {2} form a set with this value!", _moduleId, (Position)correctPositions[0], (Position)correctPositions[1]);
     }
 
 
@@ -488,14 +507,87 @@ public class ColouredCubesModule : MonoBehaviour {
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use !{0} to do something.";
+    private readonly string TwitchHelpMessage = @"Use !{0} 0-8 in reading order to select/deselect cubes. Use !{0} s1/2/3 to press stage lights. " +
+                                                    "Use !{0} screen to press the screen button. Chain commands together with spaces.";
 #pragma warning restore 414
 
-    IEnumerator ProcessTwitchCommand(string Command) {
+    IEnumerator ProcessTwitchCommand(string command) {
+        string[] commandList;
+
+        command = command.Trim().ToUpper();
+        commandList = command.Split(' ');
         yield return null;
+
+        if (commandList.Any(c => !_twitchCubeCommandList.Contains(c) && !_twitchButtonCommandList.Contains(c))) {
+            yield return "sendtochaterror Invalid command!";
+            yield break;
+        }
+
+        foreach (string instruction in commandList) {
+            if (!_allowButtonInteraction) {
+                yield return "sendtochaterror Cannot execute command '" + instruction + "' as module is busy. Stopping execution.";
+                yield break;
+            }
+
+            if (!_allowCubeInteraction && _twitchCubeCommandList.Contains(instruction)) {
+                yield return "sendtochaterror Cannot select cube " + instruction + " as cubes are not currently selectable. " +
+                                "Make sure the module is displaying the *current* stage. Stopping execution.";
+                yield break;
+            }
+
+            if (_twitchCubeCommandList.Contains(instruction)) {
+                Cubes[int.Parse(instruction)].GetComponent<KMSelectable>().OnInteract();
+            } else if (instruction == "SCREEN") {
+                Screen.GetComponent<KMSelectable>().OnInteract();
+            } else {
+                StageLights[instruction[1] - '1'].GetComponent<KMSelectable>().OnInteract();
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     IEnumerator TwitchHandleForcedSolve() {
+        bool done = false;
+
         yield return null;
+
+        if (_moduleSolved) {
+            yield break;
+        }
+
+        // Wait for module to be idle.
+        do {
+            yield return new WaitForSeconds(1f);
+        } while (!_allowButtonInteraction);
+
+        if (_internalStage == 0) {
+            Screen.GetComponent<KMSelectable>().OnInteract();
+        } else if (_internalStage != _displayedStage || _displayingSizeChart) {
+            StageLights[_internalStage - 1].GetComponent<KMSelectable>().OnInteract();
+        }
+
+        // Using ToArray() to copy the list, as this list is modified on interaction.
+        foreach (int i in _selectedPositions.ToArray()) {
+            Cubes[i].GetComponent<KMSelectable>().OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        while (!done) {
+            do {
+                yield return new WaitForSeconds(1f);
+            } while (!_allowCubeInteraction);
+
+            foreach (int i in _stages[_internalStage - 1].CorrectPositions) {
+                Cubes[i].GetComponent<KMSelectable>().OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            if (_internalStage == 3) {
+                done = true;
+            }
+            
+            Screen.GetComponent<KMSelectable>().OnInteract();
+        }
     }
 }
