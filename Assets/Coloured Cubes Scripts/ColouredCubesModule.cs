@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
+using System.Net.Configuration;
 
 public class ColouredCubesModule : MonoBehaviour {
     public KMBombInfo Bomb;
@@ -19,6 +20,8 @@ public class ColouredCubesModule : MonoBehaviour {
 
     public Set SET;
     public Permutations PermGenerator;
+
+    private const int _moveTrackCount = 5;
 
     private readonly string[] _twitchCubeCommandList = new string[] {
         "0",
@@ -160,10 +163,14 @@ public class ColouredCubesModule : MonoBehaviour {
         if (_selectedPositions.Contains(cube.Position)) {
             cube.SetHighlight(false);
             _selectedPositions.Remove(cube.Position);
+            Audio.PlaySoundAtTransform("Deselect", cube.GetComponent<Transform>());
+
             if (_possibleSubmission) { DisableSubmission(); }
         } else if (!_possibleSubmission) {
             cube.SetHighlight(true);
             _selectedPositions.Add(cube.Position);
+            Audio.PlaySoundAtTransform("Select", cube.GetComponent<Transform>());
+
             if (!_possibleSubmission && _selectedPositions.Count() == _selectionsNeededForSubmission) { EnableSubmission(); }
         }
     }
@@ -241,6 +248,8 @@ public class ColouredCubesModule : MonoBehaviour {
         }
         Debug.LogFormat("[Coloured Cubes #{0}] Strike! You selected {1}, which was incorrect.", _moduleId, selectedCubes);
 
+
+        Audio.PlaySoundAtTransform("Negative Beeps", Module.GetComponent<Transform>());
         DeselectCubes();
         ColouredCube.StrikeFlash(Cubes);
         DisableSubmission();
@@ -288,6 +297,7 @@ public class ColouredCubesModule : MonoBehaviour {
     }
 
     IEnumerator SizeChartAnimation(SetValue[] setValues) {
+        Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
         Screen.EnableOverrideText("...");
         _allowButtonInteraction = false;
         _allowCubeInteraction = false;
@@ -300,6 +310,7 @@ public class ColouredCubesModule : MonoBehaviour {
         Screen.DefaultText = "Size Chart";
         Screen.DisableOverrideText();
         _allowButtonInteraction = true;
+        Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
     }
 
     void HideSizeChart() {
@@ -316,6 +327,7 @@ public class ColouredCubesModule : MonoBehaviour {
 
 
     IEnumerator StageOneAnimation() {
+        Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
         Screen.EnableOverrideText("...");
         _allowButtonInteraction = false;
         _allowCubeInteraction = false;
@@ -334,6 +346,7 @@ public class ColouredCubesModule : MonoBehaviour {
         _displayedStage = 1;
         Screen.DisableOverrideText();
         _allowButtonInteraction = true;
+        Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
 
         if (_internalStage == 0) {
             DoStageOneLogging();
@@ -360,21 +373,22 @@ public class ColouredCubesModule : MonoBehaviour {
     }
 
     IEnumerator StageTwoAnimation(bool showCycles = true) {
+        Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
         Screen.EnableOverrideText("...");
         _allowButtonInteraction = false;
         _allowCubeInteraction = false;
 
         StageLight.SetColours(StageLights, _stages[2].StageLightColours);
-
         DeselectCubes();
 
         if (showCycles) {
-            ColouredCube.ShrinkAndMakeWhite(Cubes);
+            ColouredCube.ShrinkAndMakeWhite(Cubes); 
             do { yield return null; } while (ColouredCube.AreBusy(Cubes));
 
             foreach (Cycle cycle in _stageTwoCycles) {
                 // Reveals cubes that are in the cycle and hides the rest.
                 ColouredCube.SetHiddenStates(Cubes, Cubes.Select((cube, index) => !cycle.Elements.Contains(index)).ToArray());
+                Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
                 do { yield return null; } while (ColouredCube.AreBusy(Cubes));
 
                 foreach (int position in cycle.Elements) {
@@ -385,6 +399,7 @@ public class ColouredCubesModule : MonoBehaviour {
                 ReorderCubes();
             }
 
+            Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
             ColouredCube.SetHiddenStates(Cubes, false);
             do { yield return null; } while (ColouredCube.AreBusy(Cubes));
         }
@@ -397,6 +412,7 @@ public class ColouredCubesModule : MonoBehaviour {
         _displayedStage = 2;
         Screen.DisableOverrideText();
         _allowButtonInteraction = true;
+        Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
 
         if (_internalStage == 1) {
             DoStageTwoLogging();
@@ -443,6 +459,7 @@ public class ColouredCubesModule : MonoBehaviour {
     }
 
     IEnumerator StageThreeAnimation() {
+        Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
         Screen.EnableOverrideText("...");
         _allowButtonInteraction = false;
         _allowCubeInteraction = false;
@@ -457,6 +474,7 @@ public class ColouredCubesModule : MonoBehaviour {
         _displayedStage = 3;
         Screen.DisableOverrideText();
         _allowButtonInteraction = true;
+        Audio.PlaySoundAtTransform("Move " + Rnd.Range(1, _moveTrackCount).ToString(), Module.GetComponent<Transform>());
 
         if (_internalStage == 2) {
             DoStageThreeLogging();
