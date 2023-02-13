@@ -33,7 +33,7 @@
                 <p>This module initially contains only a pressable screen, an empty square surface, and three stage-light buttons. Press the screen to start.</p>
 
                 <p>
-                    Pressing the screen reveals nine colourful cubes, each of varying colours and sizes. Each cube has four <b>values</b>: the red, green, and blue components* of its colour, and its size. 
+                    Pressing the screen reveals nine colourful cubes, each of varying colours and sizes. Each cube has four <b>values</b>: the red, green, and blue components* of its colour, and its size (<b>RGBS</b>). 
                     Sizes** are valued from zero (smallest) to two (largest).
                 </p>
 
@@ -51,12 +51,14 @@
 
                 <h3>Positional Modifications</h3>
 
-                <p>The cubes do not reveal their true nature; they all modify their displayed properties based on their <b>true positions</b> as follows:</p>
-                
-                <ul>
-                    <li></li>
-                </ul>
+                <p>
+                    The cubes do not reveal their true nature; they all modify their displayed properties based on their <b>true positions</b>:
+                    rows represent red, green, and blue from top to bottom and the columns are numbered from zero to two, left to right. Each cube
+                    has increased by one the value of the colour component corresponding to its row, and increased its size by its column number.
+                    All values are kept modulo 3.
+                </p>
 
+                <p>For example, a large red cube (values 2002 in RGBS order) with middle-right as its true position, has actual values of 2200.</p>
             </div>
             <div class="page-footer relative-footer">1</div>
         </div>
