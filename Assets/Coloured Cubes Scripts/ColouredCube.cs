@@ -272,9 +272,9 @@ public class ColouredCube : MonoBehaviour, IColouredItem {
 
         yield return null;
 
-        while (elapsedTime / _transitionTime <= 1) {
+        while (elapsedTime / 2 * _transitionTime <= 1) {
             elapsedTime += Time.deltaTime;
-            transitionProgress = Mathf.Min(elapsedTime / _transitionTime, 1);
+            transitionProgress = Mathf.Min(elapsedTime / 2 * _transitionTime, 1);
             _cubeTransform.localPosition = new Vector3(oldX + transitionProgress * xDifference, _cubeTransform.localPosition.y, oldZ + transitionProgress * zDifference);
             yield return null;
         }
