@@ -9,8 +9,8 @@ using Rnd = UnityEngine.Random;
 public class ColouredCube : MonoBehaviour, IColouredItem {
     private const float _transitionTime = 1;
     private const float _biggestCubeSize = 0.028f;
-    private const float _topLeftCubeXValue = -0.056f;
-    private const float _topLeftCubeZValue = 0.014f;
+    private const float _topLeftCubeXValue = -0.035f;
+    private const float _topLeftCubeZValue = 0.035f;
     private const float _revealedYValue = 0.013f;
     private const float _distanceBetweenCubes = 0.035f;
 

@@ -8,6 +8,8 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 using System.Net.Configuration;
+using NUnit.Framework.Constraints;
+using Newtonsoft.Json.Converters;
 
 public class ColouredCubesModule : MonoBehaviour {
     public KMBombInfo Bomb;
@@ -17,12 +19,70 @@ public class ColouredCubesModule : MonoBehaviour {
     public ColouredCube[] Cubes;
     public StageLight[] StageLights;
     public ScreenButton Screen;
+    public Transform CubeGrid;
 
     public Set SET;
     public Permutations PermGenerator;
 
     private const int _moveTrackCount = 5;
 
+    private List<Func<IEnumerator>> _stageThreeAnimations = new List<Func<IEnumerator>>();
+
+    private readonly string[] _strikeSounds = new string[] {
+        "genius",
+        "glossy road",
+        "hang on",
+        "I'm taking it with a grain of salt",
+        "inchresting",
+        "incorrect",
+        "Negative Beeps",
+        "kuro analysis",
+        "microwave interactive",
+        "oke",
+        "plays fault",
+        "probably thinking",
+        "smarts",
+        "so stupid",
+        "stupid",
+        "sure",
+        "sureee",
+        "well done",
+        "wot",
+        "yeah",
+        "yep",
+        "yepmhm",
+        "genius (1)",
+        "Gloucester_road",
+        "goodfish",
+        "grain_of_salt",
+        "interesting",
+        "liemuh",
+        "so_stupid",
+        "Sierra_interacts_with_the_oven",
+        "sorry",
+        "yep_I_was_probably_thinking_that",
+        "yepmhm (1)",
+        "yo"
+    };
+    private readonly string[] _solveSounds = new string[] {
+        "amazing",
+        "awesome",
+        "congratulations",
+        "fantastic",
+        "green",
+        "kuro cornetto",
+        "kuro noodle",
+        "kuro spaghetti",
+        "nice",
+        "yay long",
+        "yay short"
+    };
+    private readonly string[] _stageThreeSounds = new string[] {
+        "nyoom",
+        "spin",
+        "to the trains",
+        "weeee"
+    };
     private readonly string[] _twitchCubeCommandList = new string[] {
         "0",
         "1",
@@ -78,6 +138,7 @@ public class ColouredCubesModule : MonoBehaviour {
     private bool _allowCubeInteraction = false;
     private bool _possibleSubmission = false;
     private bool _displayingSizeChart = false;
+    private bool _gridMoving = false;
 
     void Awake() {
         _moduleId = s_moduleIdCounter++;
@@ -104,6 +165,11 @@ public class ColouredCubesModule : MonoBehaviour {
 
     void Start() {
         GenerateStages();
+
+        _stageThreeAnimations.Add(XFlip);
+        _stageThreeAnimations.Add(ZFlip);
+        _stageThreeAnimations.Add(Spiral);
+
         Screen.DefaultText = "Start";
         Debug.LogFormat("[Coloured Cubes #{0}] Press the screen the start.", _moduleId);
     }
@@ -139,7 +205,7 @@ public class ColouredCubesModule : MonoBehaviour {
         }
 
         stageThreePositions = stageOnePositions.Select((element, index) => FindPositionSet(element, stageTwoPositions[index])).ToArray();
-        _stageThreeHiddenValue = SET.FindSetWith(new SetValue(stageOneRed, stageOneGreen, stageOneBlue, stageTwoSize), new SetValue(stageTwoRed, stageTwoGreen, stageTwoBlue, stageTwoSize));
+        _stageThreeHiddenValue = SET.FindSetWith(new SetValue(stageOneRed, stageOneGreen, stageOneBlue, stageOneSize), new SetValue(stageTwoRed, stageTwoGreen, stageTwoBlue, stageTwoSize));
 
         _stages[0] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9), SET.MostRecentCorrectPositions.ToArray(), stageOnePositions, stageOneColours);
         _stages[1] = new StageInfo(SET.GenerateSETValuesWithOneSet(4, 9), SET.MostRecentCorrectPositions.ToArray(), stageTwoPositions, stageTwoColours);
@@ -249,7 +315,7 @@ public class ColouredCubesModule : MonoBehaviour {
         Debug.LogFormat("[Coloured Cubes #{0}] Strike! You selected {1}, which was incorrect.", _moduleId, selectedCubes);
 
 
-        Audio.PlaySoundAtTransform("Negative Beeps", Module.GetComponent<Transform>());
+        Audio.PlaySoundAtTransform(_strikeSounds[Rnd.Range(0, _strikeSounds.Length)], Module.GetComponent<Transform>());
         DeselectCubes();
         ColouredCube.StrikeFlash(Cubes);
         DisableSubmission();
@@ -264,6 +330,7 @@ public class ColouredCubesModule : MonoBehaviour {
     void SolveModule() {
         _allowButtonInteraction = false;
         _moduleSolved = true;
+        Audio.PlaySoundAtTransform(_solveSounds[Rnd.Range(0, _solveSounds.Length)], Module.GetComponent<Transform>());
 
         StartCoroutine(SolveAnimation());
         Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", _moduleId);
@@ -467,8 +534,12 @@ public class ColouredCubesModule : MonoBehaviour {
         StageLight.SetColours(StageLights, _stages[2].StageLightColours);
 
         DeselectCubes();
+        StartCoroutine(_stageThreeAnimations[Rnd.Range(0, _stageThreeAnimations.Count())]());
+        Audio.PlaySoundAtTransform(_stageThreeSounds[Rnd.Range(0, _stageThreeSounds.Length)], Module.GetComponent<Transform>());
+        _gridMoving = true;
+
         ColouredCube.AssignSetValues(Cubes, _stages[2].AllValues, _stages[2].TruePositions);
-        do { yield return null; } while (ColouredCube.AreBusy(Cubes));
+        do { yield return null; } while (ColouredCube.AreBusy(Cubes) || _gridMoving);
 
         Screen.DefaultText = "Stage 3";
         _displayedStage = 3;
@@ -498,6 +569,77 @@ public class ColouredCubesModule : MonoBehaviour {
         Debug.LogFormat("[Coloured Cubes #{0}] {1} and {2} form a set with this value!", _moduleId, (Position)correctPositions[0], (Position)correctPositions[1]);
     }
 
+    IEnumerator XFlip() {
+        float elapsedTime = 0;
+        float transitionTime = 1;
+        float transitionProgress;
+        float oldX = CubeGrid.localPosition.x;
+        float oldZ = CubeGrid.localPosition.z;
+        int rotationDirection = Rnd.Range(0, 2) * 2 - 1; // Gives 1 or -1.
+
+        yield return null;
+
+        while (elapsedTime / transitionTime <= 1) {
+            elapsedTime += Time.deltaTime;
+            transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
+            CubeGrid.Rotate(new Vector3(rotationDirection * Time.deltaTime * 360 / transitionTime, 0, 0));
+            CubeGrid.localPosition = new Vector3(oldX, 0.1f * Mathf.Sin(transitionProgress * Mathf.PI), oldZ);
+            yield return null;
+        }
+
+        CubeGrid.localRotation = new Quaternion(0, 0, 0, 0);
+        _gridMoving = false;
+    }
+
+    IEnumerator ZFlip() {
+        float elapsedTime = 0;
+        float transitionTime = 1;
+        float transitionProgress;
+        float oldX = CubeGrid.localPosition.x;
+        float oldZ = CubeGrid.localPosition.z;
+        int rotationDirection = Rnd.Range(0, 2) * 2 - 1;
+
+        yield return null;
+
+        while (elapsedTime / transitionTime <= 1) {
+            elapsedTime += Time.deltaTime;
+            transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
+            CubeGrid.Rotate(new Vector3(0, 0, rotationDirection * Time.deltaTime * 360 / transitionTime));
+            CubeGrid.localPosition = new Vector3(oldX, 0.1f * Mathf.Sin(transitionProgress * Mathf.PI), oldZ);
+            yield return null;
+        }
+
+        CubeGrid.localRotation = new Quaternion(0, 0, 0, 0);
+        _gridMoving = false;
+    }
+
+    IEnumerator Spiral() {
+        float elapsedTime = 0;
+        float transitionTime = 1;
+        float transitionProgress;
+        float oldX = CubeGrid.localPosition.x;
+        float oldZ = CubeGrid.localPosition.z;
+        float radius;
+        float newX;
+        float newZ;
+        int rotationCount = Rnd.Range(1, 4);
+        int rotationDirection = Rnd.Range(0, 2) * 2 - 1;
+
+        yield return null;
+
+        while (elapsedTime / transitionTime <= 1) {
+            elapsedTime += Time.deltaTime;
+            transitionProgress = Mathf.Min(elapsedTime / transitionTime, 1);
+            radius = 0.2f * Mathf.Sin(transitionProgress * Mathf.PI);
+            newX = oldX + radius * Mathf.Cos(transitionProgress * Mathf.PI * rotationCount * 2);
+            newZ = oldZ + radius * Mathf.Sin(transitionProgress * Mathf.PI * rotationCount * 2) * rotationDirection;
+            CubeGrid.localPosition = new Vector3(newX, 0, newZ);
+            yield return null;
+        }
+
+        CubeGrid.localPosition = new Vector3(oldX, 0, oldZ);
+        _gridMoving = false;
+    }
 
     private class StageInfo {
         private readonly SetValue[] _allValues;
