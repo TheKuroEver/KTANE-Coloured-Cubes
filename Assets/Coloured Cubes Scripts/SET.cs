@@ -84,6 +84,7 @@ public class Set : MonoBehaviour {
 
         _mostRecentCorrectValues.Add(FindSetWith(_mostRecentCorrectValues[0], _mostRecentCorrectValues[1]));
         _allowedValues.Remove(_mostRecentCorrectValues[2]);
+        Debug.Log("Added " + _mostRecentCorrectValues[0].ToString() + " " + _mostRecentCorrectValues[1].ToString() + " " + _mostRecentCorrectValues[2].ToString());
 
         if (hiddenValue != null) { _mostRecentCorrectValues.RemoveAt(0); }
     }
@@ -112,6 +113,8 @@ public class Set : MonoBehaviour {
     }
 
     private void RemoveExcessSets(SetValue lastAddedValue, List<SetValue> valuesSoFar) {
+        valuesSoFar = valuesSoFar.Concat(_mostRecentCorrectValues).Distinct().ToList();
+
         foreach (SetValue value in valuesSoFar) {
             _allowedValues.Remove(FindSetWith(lastAddedValue, value));
         }
