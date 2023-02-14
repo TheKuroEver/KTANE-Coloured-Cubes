@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1">
+    <title>Coloured Cubes — Keep Talking and Nobody Explodes Module</title>
+    <link rel="stylesheet" type="text/css" href="css/font.css">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="js/ktane-utils.js"></script>
+    <style>
+        .dark table, table {
+            margin: 1em auto;
+            border: none;
+        }
+
+        .page-footer::before { content: 'Page '; }
+        .page-footer::after { content: ' of 2'; }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <div class="page page-bg-01">
+            <div class="page-header">
+                <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+                <span class="page-header-section-title">Coloured Cubes</span>
+            </div>
+            <div class="page-content">
+                <img src="img/Component/Module Name.svg" class="diagram">
+                <h2>On the Subject of Coloured Cubes</h2>
+                <p class="flavour-text">WHY ARE THEY MOVING??!?</p>
+
+                <p>
+                    This module initially contains only a pressable screen, an empty square surface, and three stage-light buttons. Press the screen to start.
+                </p>
+
+                <p>
+                    Pressing the screen reveals nine colourful cubes, each of varying colours and sizes. Select cubes to form sets in three stages to solve the module.
+                </p>
+
+                <!-- Need to add this somewhere.
+                <p style="font-size:13px; color:#7A868D">
+                    *See <b>APPENDIX-COLOUR</b> for a breakdown of colours into their components.<br>
+                    **Press the screen to view all possible sizes.
+                </p>
+                -->
+
+                <h3>Sets</h3>
+
+                <p>
+                    For this module, <b>set</b> is a group of three like objects with any number of <b>parameters</b>, such that <u>for each</u> parameter,
+                    its value is either the same, or different for all three objects.
+                </p>
+
+                <p>
+                    For example, red (200), green (020), and olive (110) form a set while aqua (122), lime (120), and white (222) do not. The parameters in this case
+                    are the red, green, and blue ternary components of each colour.
+                </p>
+
+                <h3>Solving</h3>
+                <h4>True Postions</h4>
+                
+                <p>
+                    In each stage, first note down the colour and size* of each cube. Then determine each cube's <b>true position</b> using the table below. Use these positions
+                    to determine the parameters of each cube in the next section.
+                </p>
+
+                <table>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Notes</th>
+                        <th>True Positions</th>
+                    </tr>
+                    <tr>
+                        <th>1</th>
+                        <td>None</td>
+                        <td>The physical position of the cube on the module.</td>
+                    </tr>
+                    <tr>
+                        <th>2</th>
+                        <td>The cubes will shuffle around** on the module.</td>
+                        <td>The physical position of the cube on the module in stage one, before shuffling.</td>
+                    </tr>
+                    <tr>
+                        <th>3</th>
+                        <td>The cubes will <i>have a good time</i>. Ignore their frolicking.</td>
+                        <td>The position which forms a set with the true positions of the cube in the previous two stages. Use the row and column of each position as parameters.</td>
+                    </tr>
+                </table>
+
+                <p style="font-size:13px; color:#7A868D">
+                    * Press the screen to view all possible sizes.<br>
+                    ** See the <u><b>Stage Lights</b></u> section if you missed the movements.
+                </p>
+
+            </div>
+            <div class="page-footer relative-footer">1</div>
+        </div>
+
+        <div class="page page-bg-02">
+            <div class="page-header">
+                <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+                <span class="page-header-section-title">Coloured Cubes</span>
+            </div>
+            <div class="page-content">
+                <h4>Modifying the Cubes</h4>
+                <p>More info.</p>
+            </div>
+            <div class="page-footer relative-footer">2</div>
+        </div>
+    </div>
+</body>
+</html>
