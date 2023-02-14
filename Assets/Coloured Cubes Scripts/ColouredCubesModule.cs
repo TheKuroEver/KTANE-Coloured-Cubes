@@ -165,7 +165,7 @@ public class ColouredCubesModule : MonoBehaviour {
         _stageThreeAnimations.Add(ZFlip);
         _stageThreeAnimations.Add(Spiral);
 
-        Screen.DefaultText = "Start";
+        Screen.EnableOverrideText("Start");
         Debug.LogFormat("[Coloured Cubes #{0}] Press the screen the start.", _moduleId);
     }
 
@@ -327,6 +327,7 @@ public class ColouredCubesModule : MonoBehaviour {
         _moduleSolved = true;
         Audio.PlaySoundAtTransform(_solveSounds[Rnd.Range(0, _solveSounds.Length)], Module.GetComponent<Transform>());
 
+        Screen.EnableOverrideText("Solved!");
         StartCoroutine(SolveAnimation());
         Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", _moduleId);
         Debug.LogFormat("[Coloured Cubes #{0}] Module solved!", _moduleId);
