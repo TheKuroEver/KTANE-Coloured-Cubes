@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using UnityEngine;
-using KModkit;
-using Rnd = UnityEngine.Random;
+﻿using UnityEngine;
 
 public class ScreenButton : MonoBehaviour {
     private TextMesh _screenText;

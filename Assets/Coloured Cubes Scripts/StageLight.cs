@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using KModkit;
-using Rnd = UnityEngine.Random;
 
 public class StageLight : MonoBehaviour, IColouredItem {
     [SerializeField] private MeshRenderer _stageLightRenderer;

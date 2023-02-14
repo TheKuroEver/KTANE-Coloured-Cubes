@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
-using System.Net.Configuration;
-using NUnit.Framework.Constraints;
-using Newtonsoft.Json.Converters;
 
 public class ColouredCubesModule : MonoBehaviour {
     public KMBombInfo Bomb;
