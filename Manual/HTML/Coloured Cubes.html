@@ -124,24 +124,20 @@
                 <h4>Stage Lights</h4>
 
                 <p>
-                    The stage lights along the side of the module display information needed for stage three:
+                    The stage lights along the side of the module can be used to go back to previous stages, for example to view the cube shuffling again for stage two.
+                    Pressing a stage light will show the stage corresponding to its position, plus one.
                 </p>
 
                 <p>
-                    In the first two stages, the lights will display red, green, and blue values using additive colour mixing. In stage one, the values for each component correspond to the position
-                    <u>with</u> the component. In stage two, it's the position <u>without</u> the component. Positions are 0, 1, and 2 from <u>bottom to top</u>.
+                    They also display information needed for stage three: in the first two stages, the lights will display red, green, and blue values using additive colour mixing.
+                    In stage one, the values for each component correspond to the position <u>with</u> the component. In stage two, it's the position <u>without</u> the component.
+                    Positions are 0, 1, and 2 from <u>bottom to top</u>.
                 </p>
 
                 <p>
                     Combine these values with the number of ports (stage one) or indicators (stage two) on the bomb, modulo 3, as the size to get a cube state for each stage.
                     The hidden value for stage three is the cube state which forms a set with the states from the first two stages.
                 </p>
-
-                <p>
-                    They can also be used to go back to previous stages, for example to view the cube shuffling again for stage two.
-                    Pressing a stage light will show the stage corresponding to its position, plus one.
-                </p>
-
                 <p style="font-size:13px; color:#7A868D">
                     * See <u><b>APPENDIX-COLOUR</b></u> for a breakdown of colours into their components.
                 </p>
