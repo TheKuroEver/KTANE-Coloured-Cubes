@@ -15,7 +15,7 @@
         }
 
         .page-footer::before { content: 'Page '; }
-        .page-footer::after { content: ' of 2'; }
+        .page-footer::after { content: ' of 3'; }
     </style>
 </head>
 <body>
@@ -31,19 +31,12 @@
                 <p class="flavour-text">WHY ARE THEY MOVING??!?</p>
 
                 <p>
-                    This module initially contains only a pressable screen, an empty square surface, and three stage-light buttons. Press the screen to start.
+                    This module initially contains only a pressable screen and three stage light buttons. Press the screen to start.
                 </p>
 
                 <p>
                     Pressing the screen reveals nine colourful cubes, each of varying colours and sizes. Select cubes to form sets in three stages to solve the module.
                 </p>
-
-                <!-- Need to add this somewhere.
-                <p style="font-size:13px; color:#7A868D">
-                    *See <b>APPENDIX-COLOUR</b> for a breakdown of colours into their components.<br>
-                    **Press the screen to view all possible sizes.
-                </p>
-                -->
 
                 <h3>Sets</h3>
 
@@ -69,7 +62,7 @@
                     <tr>
                         <th>Stage</th>
                         <th>Notes</th>
-                        <th>True Positions</th>
+                        <th>True Position</th>
                     </tr>
                     <tr>
                         <th>1</th>
@@ -89,7 +82,7 @@
                 </table>
 
                 <p style="font-size:13px; color:#7A868D">
-                    * Press the screen to view all possible sizes.<br>
+                    * Press the screen to view all possible sizes. Press the screen again to go back.<br>
                     ** See the <u><b>Stage Lights</b></u> section if you missed the movements.
                 </p>
 
@@ -104,9 +97,134 @@
             </div>
             <div class="page-content">
                 <h4>Modifying the Cubes</h4>
-                <p>More info.</p>
+                <p>
+                    Each cube has been modified using its true position as follows:
+                </p>
+
+                <ul>
+                    <li>The rows correspond to red, green, and blue from top to bottom. The colour component corresponding to the cube's row has been incremented by 1 (wrapping back down to 0 from 2).</li>
+                    <li>The columns are numbered 0, 1, and 2 from left to right. Each cube's size has been increased by its column number (wrapping as above).</li>
+                </ul>
+
+                <p>
+                    For example, a big red cube with true position at bottom-middle (column 1, blue row) will be displayed as a small rose cube.
+                </p>
+
+                <p>
+                    Reverse these changes to determine the actual state of each cube.
+                </p>
+
+                <h4>Submitting</h4>
+
+                <p>
+                    In the first two stages, select the three cubes which form a set, using their RGB colour* components and sizes as parameters. In stage three, select the two cubes which form a
+                    set with the <b>hidden value</b>, determined by the colours of the <b>stage lights</b> in the previous two stages. Press the screen to submit.
+                </p>
+
+                <h4>Stage Lights</h4>
+
+                <p>
+                    The stage lights along the side of the module display information needed for stage three:
+                </p>
+
+                <p>
+                    In the first two stages, the lights will display red, green, and blue values using additive colour mixing. In stage one, the values for each component correspond to the position
+                    <u>with</u> the component. In stage two, it's the position <u>without</u> the component. Positions are 0, 1, and 2 from <u>bottom to top</u>.
+                </p>
+
+                <p>
+                    Combine these values with the number of ports (stage one) or indicators (stage two) on the bomb, modulo 3, as the size to get a cube state for each stage.
+                    The hidden value for stage three is the cube state which forms a set with the states from the first two stages.
+                </p>
+
+                <p>
+                    They can also be used to go back to previous stages, for example to view the cube shuffling again for stage two.
+                    Pressing a stage light will show the stage corresponding to its position, plus one.
+                </p>
+
+                <p style="font-size:13px; color:#7A868D">
+                    * See <u><b>APPENDIX-COLOUR</b></u> for a breakdown of colours into their components.
+                </p>
             </div>
             <div class="page-footer relative-footer">2</div>
+        </div>
+
+        <div class="page page-bg-03">
+            <div class="page-header">
+                <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+                <span class="page-header-section-title">Coloured Cubes</span>
+            </div>
+            <div class="page-content">
+                <h3>APPENDIX-COLOUR</h3>
+
+                <table style="font-size: 25px">
+                    <colgroup>
+                        <col span="5">
+                        <col style="border-left-width:thick;">
+                    </colgroup>
+                    <tr>
+                        <td class="empty"></td><th>Colour</th><th>R</th><th>G</th><th>B</th>
+                        <td class="empty"></td><th>Colour</th><th>R</th><th>G</th><th>B</th>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #ff0080;"></td><td>Rose</td>   <td>2</td><td>0</td><td>1</td>
+                        <td style="background-color: #ff0000;"></td><td>Red</td>    <td>2</td><td>0</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #ff8000;"></td><td>Orange</td> <td>2</td><td>1</td><td>0</td>
+                        <td style="background-color: #ffff00;"></td><td>Yellow</td> <td>2</td><td>2</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #80ff00;"></td><td>Lime</td>   <td>1</td><td>2</td><td>0</td>
+                        <td style="background-color: #00ff00;"></td><td>Green</td>  <td>0</td><td>2</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #00ff80;"></td><td>Jade</td>   <td>0</td><td>2</td><td>1</td>
+                        <td style="background-color: #0000ff;"></td><td>Blue</td>   <td>0</td><td>0</td><td>2</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #0080ff;"></td><td>Azure</td>  <td>0</td><td>1</td><td>2</td>
+                        <td style="background-color: #00ffff;"></td><td>Cyan</td>   <td>0</td><td>2</td><td>2</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #8000ff;"></td><td>Violet</td> <td>1</td><td>0</td><td>2</td>
+                        <td style="background-color: #ff00ff;"></td><td>Magenta</td><td>2</td><td>0</td><td>2</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #ff80ff;"></td><td>Pink</td>   <td>2</td><td>1</td><td>2</td>
+                        <td style="background-color: #800080;"></td><td>Plum</td>   <td>1</td><td>0</td><td>1</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #ff8080;""></td><td>Salmon</td><td>2</td><td>1</td><td>1</td>
+                        <td style="background-color: #800000;"></td><td>Maroon</td> <td>1</td><td>0</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #ffff80;""></td><td>Cream</td> <td>2</td><td>2</td><td>1</td>
+                        <td style="background-color: #808000;"></td><td>Olive</td>  <td>1</td><td>1</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #80ff80;""></td><td>Mint</td>  <td>1</td><td>2</td><td>1</td>
+                        <td style="background-color: #008000;"></td><td>Forest</td> <td>0</td><td>1</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #80ffff;""></td><td>Aqua</td>  <td>1</td><td>2</td><td>2</td>
+                        <td style="background-color: #008080;"></td><td>Teal</td>   <td>0</td><td>1</td><td>1</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #8080ff;""></td><td>Maya</td>  <td>1</td><td>1</td><td>2</td>
+                        <td style="background-color: #000080;"></td><td>Indigo</td> <td>0</td><td>0</td><td>1</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #ffffff;""></td><td>White</td> <td>2</td><td>2</td><td>2</td>
+                        <td style="background-color: #808080;"></td><td>Grey</td>   <td>1</td><td>1</td><td>1</td>
+                    </tr>
+                    <tr>
+                        <td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td>
+                        <td style="background-color: #000000;"></td><td>Black</td>  <td>0</td><td>0</td><td>0</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="page-footer relative-footer">3</div>
         </div>
     </div>
 </body>

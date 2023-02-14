@@ -44,7 +44,7 @@ public class ColouredCube : MonoBehaviour, IColouredItem {
         { "101", "Plum" },
         { "102", "Violet" },
         { "110", "Olive" },
-        { "111", "Gray" },
+        { "111", "Grey" },
         { "112", "Maya" },
         { "120", "Lime" },
         { "121", "Mint" },
