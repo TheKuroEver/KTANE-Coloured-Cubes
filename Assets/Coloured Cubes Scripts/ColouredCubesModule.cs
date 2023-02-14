@@ -41,23 +41,11 @@ public class ColouredCubesModule : MonoBehaviour {
         "stupid",
         "sure",
         "sureee",
-        "well done",
+        "well done", //goodfish
         "wot",
         "yeah",
         "yep",
-        "yepmhm",
-        "genius (1)",
-        "Gloucester_road",
-        "goodfish",
-        "grain_of_salt",
-        "interesting",
-        "liemuh",
-        "so_stupid",
-        "Sierra_interacts_with_the_oven",
-        "sorry",
-        "yep_I_was_probably_thinking_that",
-        "yepmhm (1)",
-        "yo"
+        "yepmhm"
     };
     private readonly string[] _solveSounds = new string[] {
         "amazing",
@@ -433,6 +421,7 @@ public class ColouredCubesModule : MonoBehaviour {
 
         Debug.LogFormat("[Coloured Cubes #{0}] Set values are in red-green-blue-size order.", _moduleId);
         Debug.LogFormat("[Coloured Cubes #{0}] Stage light colours are in 0-1-2 order.", _moduleId);
+        Debug.LogFormat("[Coloured Cubes #{0}] Positions are in letter-number form, with the letter indicating column (left to right) and the number indicating row (top to bottom)", _moduleId);
         Debug.LogFormat("[Coloured Cubes #{0}] -=-==-=-", _moduleId);
         Debug.LogFormat("[Coloured Cubes #{0}] Stage 1:", _moduleId);
         Debug.LogFormat("[Coloured Cubes #{0}] The stage lights display {1}, {2}, and {3}.", _moduleId, StageLights[0].ColourName.ToLower(), StageLights[1].ColourName.ToLower(), StageLights[2].ColourName.ToLower());
