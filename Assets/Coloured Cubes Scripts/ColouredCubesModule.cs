@@ -70,7 +70,9 @@ public class ColouredCubesModule : MonoBehaviour {
         "kuro spaghetti",
         "nice",
         "yay long",
-        "yay short"
+        "yay short",
+        "Solve 1",
+        "Solve 2"
     };
     private readonly string[] _stageThreeSounds = new string[] {
         "nyoom",
@@ -247,6 +249,10 @@ public class ColouredCubesModule : MonoBehaviour {
     }
 
     void StageLightPress(StageLight light) {
+        if (_moduleSolved) {
+            Audio.PlaySoundAtTransform("Solve 2", Module.GetComponent<Transform>());
+        }
+
         if (!_allowButtonInteraction) { return; }
 
         _displayingSizeChart = false;
@@ -260,8 +266,11 @@ public class ColouredCubesModule : MonoBehaviour {
         }
     }
 
-
     void ScreenPress() {
+        if (_moduleSolved) {
+            Audio.PlaySoundAtTransform("Solve 1", Module.GetComponent<Transform>());
+        }
+
         if (!_allowButtonInteraction) { return; }
 
         if (_possibleSubmission) {
@@ -561,7 +570,7 @@ public class ColouredCubesModule : MonoBehaviour {
             Debug.LogFormat("[Coloured Cubes #{0}] {1} is a {2} {3} cube. Its true position is {4}. Its actual values are {5}.", _moduleId, (Position)i, (Size)Cubes[i].Size, Cubes[i].ColourName.ToLower(), (Position)_stages[2].TruePositions[i], _stages[2].AllValues[i]);
         }
 
-        Debug.LogFormat("[Coloured Cubes #{0}] The hidden set value is {1}", _moduleId, _stageThreeHiddenValue);
+        Debug.LogFormat("[Coloured Cubes #{0}] The hidden set value is {1}.", _moduleId, _stageThreeHiddenValue);
         Debug.LogFormat("[Coloured Cubes #{0}] {1} and {2} form a set with this value!", _moduleId, (Position)correctPositions[0], (Position)correctPositions[1]);
     }
 

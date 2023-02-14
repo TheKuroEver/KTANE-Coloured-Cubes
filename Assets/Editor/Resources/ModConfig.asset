@@ -11,10 +11,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
   m_Name: ModConfig
   m_EditorClassIdentifier: 
-  id: 87788789
+  id: ColouredCubes
   title: Coloured Cubes
   author: Kuro
-  description: yes
+  description: '*flavour text*
+
+
+    Form sets using colour components and sizes to progress through three stages.
+    The cubes like to dance.
+
+
+    Manual can be found at ktane.timwi.de or in the manuals folder of your game.
+
+
+    Report bugs to Kuro#2011 on Discord.'
   version: 1
   outputFolder: build
-  previewImage: {fileID: 0}
+  previewImage: {fileID: 2800000, guid: 01cab43ac15a99042859db773f58336b, type: 3}
