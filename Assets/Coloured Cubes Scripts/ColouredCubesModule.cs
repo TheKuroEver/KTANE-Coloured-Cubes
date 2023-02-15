@@ -224,6 +224,8 @@ public class ColouredCubesModule : MonoBehaviour {
 
             if (!_possibleSubmission && _selectedPositions.Count() == _selectionsNeededForSubmission) { EnableSubmission(); }
         }
+
+        Screen.DisplayColourName(cube);
     }
 
     void EnableSubmission() {

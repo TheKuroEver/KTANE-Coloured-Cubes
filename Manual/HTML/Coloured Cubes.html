@@ -125,17 +125,25 @@
 
                 <p>
                     The stage lights along the side of the module can be used to go back to previous stages, for example to view the cube shuffling again for stage two.
-                    Pressing a stage light will show the stage corresponding to its position, plus one.
+                    The stage lights are in positions 0, 1, and 2, from bottom to top. Pressing a stage light will show the stage corresponding to its position, plus one.
                 </p>
 
                 <p>
-                    They also display information needed for stage three: in the first two stages, the lights will display red, green, and blue values using additive colour mixing.
-                    In stage one, the values for each component correspond to the position <u>with</u> the component. In stage two, it's the position <u>without</u> the component.
-                    Positions are 0, 1, and 2 from <u>bottom to top</u>.
+                    They also display information needed for stage three:
+                </p>
+                
+                <h4>Stage 3 Hidden Value</h4>
+
+                <p> 
+                    In the first two stages, the lights represent a ternary colour. In stage one, the value for each RGB component of this ternary colour
+                    is the position which <u>does</u> contain the component. In stage two, its the position which <u>does not</u> contain it.
                 </p>
 
                 <p>
                     Combine these values with the number of ports (stage one) or indicators (stage two) on the bomb, modulo 3, as the size to get a cube state for each stage.
+                </p>
+
+                <p>
                     The hidden value for stage three is the cube state which forms a set with the states from the first two stages.
                 </p>
                 <p style="font-size:13px; color:#7A868D">

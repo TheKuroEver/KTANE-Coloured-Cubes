@@ -84,9 +84,11 @@ public class Set : MonoBehaviour {
 
         _mostRecentCorrectValues.Add(FindSetWith(_mostRecentCorrectValues[0], _mostRecentCorrectValues[1]));
         _allowedValues.Remove(_mostRecentCorrectValues[2]);
-        Debug.Log("Added " + _mostRecentCorrectValues[0].ToString() + " " + _mostRecentCorrectValues[1].ToString() + " " + _mostRecentCorrectValues[2].ToString());
 
-        if (hiddenValue != null) { _mostRecentCorrectValues.RemoveAt(0); }
+        if (hiddenValue != null) {
+            _mostRecentCorrectValues.RemoveAt(0);
+            _mostRecentCorrectValues.Add(hiddenValue);
+        }
     }
 
     void RemoveDuplicatePositions(int setValueCount) {

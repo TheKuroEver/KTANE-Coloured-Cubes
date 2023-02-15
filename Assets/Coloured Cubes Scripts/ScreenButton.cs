@@ -18,7 +18,13 @@ public class ScreenButton : MonoBehaviour {
     }
 
     public void UpdateText() {
-        if (_showOverride) { _screenText.text = _overrideText; } else if (_showColour) { _screenText.text = _buttonToWatch.ColourName; } else { _screenText.text = _defaultText; }
+        if (_showOverride) {
+            _screenText.text = _overrideText;
+        } else if (_showColour) {
+            _screenText.text = _buttonToWatch.ColourName;
+        } else {
+            _screenText.text = _defaultText;
+        }
     }
 
     public void DisplayColourName(IColouredItem buttonToWatch) {

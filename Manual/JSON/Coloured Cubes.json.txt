@@ -9,14 +9,14 @@
   },
   "DefuserDifficulty": "Medium",
   "Description": "Form sets using colour components and sizes to progress through three stages.",
-  "ExpertDifficulty": "Medium",
+  "ExpertDifficulty": "Hard",
   "ModuleID": "ColouredCubes",
   "Name": "Coloured Cubes",
   "Origin": "Mods",
-  "Published": "2023-02-14",
+  "Published": "2023-02-15",
   "SortKey": "COLOUREDCUBES",
   "SourceUrl": "https://github.com/TheKuroEver/KTANE-Coloured-Cubes",
-  "SteamID": "1234567890",
+  "SteamID": "2933631572",
   "Symbol": "Coqb",
   "Type": "Regular"
 }
