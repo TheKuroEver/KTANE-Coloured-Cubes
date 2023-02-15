@@ -714,7 +714,7 @@ public class ColouredCubesModule : MonoBehaviour {
 
         // Wait for module to be idle.
         do {
-            yield return new WaitForSeconds(1f);
+            yield return true;
         } while (!_allowButtonInteraction);
 
         if (_internalStage == 0) {
@@ -731,7 +731,7 @@ public class ColouredCubesModule : MonoBehaviour {
 
         while (!done) {
             do {
-                yield return new WaitForSeconds(1f);
+                yield return true;
             } while (!_allowCubeInteraction);
 
             foreach (int i in _stages[_internalStage - 1].CorrectPositions) {
